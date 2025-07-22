@@ -1,0 +1,8 @@
+# 기본 UI 라이브러리
+npm install @radix-ui/react-slot class-variance-authority clsx tailwind-merge lucide-react
+
+# 상태 관리 및 데이터베이스
+npm install @supabase/supabase-js
+
+# 개발 도구
+npm install -D @types/node
