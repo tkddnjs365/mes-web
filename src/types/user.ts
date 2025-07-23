@@ -17,6 +17,7 @@ export interface SuperUser {
   password: string
   name: string
   permissions: string[]
+  role: "super"
 }
 
 export interface Company {
@@ -26,6 +27,7 @@ export interface Company {
   isActive: boolean
   createdAt: string
   updatedAt: string
+  description: string
 }
 
 export interface CompanyAdmin {

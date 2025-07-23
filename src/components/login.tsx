@@ -4,7 +4,7 @@ import {useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
 
 export default function Login() {
-    const {login} = useAppContext()
+    const {login, loginSuperUser} = useAppContext()
 
     const [companyCode, setCompanyCode] = useState("") //회사코드
     const [userId, setUserId] = useState("") //로그인ID
@@ -19,6 +19,10 @@ export default function Login() {
         try {
             // 슈퍼유저 로그인 체크 (회사코드가 0000인 경우)
             if (companyCode == "0000") {
+                const success = await loginSuperUser(userId, password)
+                if (!success) {
+                    alert("슈퍼관리자 로그인 정보가 올바르지 않습니다.")
+                }
             } else {
                 // 일반 사용자 로그인
                 const success = await login(companyCode, userId, password)
