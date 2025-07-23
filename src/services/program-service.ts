@@ -6,30 +6,24 @@ const mockPrograms: Program[] = [
     {
         id: '1',
         name: '1프로그램명',
-        icon: '',
         description: 'program.description || undefined',
         path: 'program.path',
-        isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     },
-      {
+    {
         id: '2',
         name: '프로그램명2',
-        icon: '',
         description: '222222',
         path: 'program.path',
-        isActive: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     },
-      {
+    {
         id: '3',
         name: '프로그램명3',
-        icon: '',
         description: '222222',
         path: 'program.path',
-        isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     }
@@ -60,6 +54,90 @@ export class ProgramService {
             }))
         } catch {
             return []
+        }
+    }
+
+    // 프로그램 생성
+    static async createProgram(programData: { name: string; path: string; description: string; }): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                const newProgram: Program = {
+                    id: Date.now().toString(),
+                    name: programData.name,
+                    description: programData.description,
+                    path: programData.path,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                }
+                mockPrograms.push(newProgram)
+                return true
+            }
+
+            const {error} = await supabase.from("programs").insert({
+                name: programData.name,
+                path: programData.path,
+                description: programData.description,
+            })
+
+            return !error
+        } catch {
+            return false
+        }
+    }
+
+    // 프로그램 수정`
+    static async updateProgram(
+        programId: string,
+        programData: {
+            name: string
+            path: string
+            description?: string
+        },
+    ): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                const programIndex = mockPrograms.findIndex((p) => p.id === programId)
+                if (programIndex === -1) return false
+
+                mockPrograms[programIndex] = {
+                    ...mockPrograms[programIndex],
+                    ...programData,
+                    updatedAt: new Date().toISOString(),
+                }
+                return true
+            }
+
+            const {error} = await supabase
+                .from("programs")
+                .update({
+                    name: programData.name,
+                    path: programData.path,
+                    description: programData.description,
+                })
+                .eq("id", programId)
+
+            return !error
+        } catch {
+            return false
+        }
+    }
+
+    // 프로그램 삭제
+    static async deleteProgram(programId: string): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                const programIndex = mockPrograms.findIndex((p) => p.id === programId)
+                if (programIndex === -1) return false
+
+                mockPrograms.splice(programIndex, 1)
+                return true
+            }
+
+            const {error} = await supabase.from("programs").delete().eq("id", programId)
+
+            return !error
+        } catch {
+            return false
         }
     }
 
@@ -102,7 +180,6 @@ export class ProgramService {
                     id: Date.now().toString(),
                     companyCode,
                     programId,
-                    isActive: true,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 })

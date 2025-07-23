@@ -58,7 +58,7 @@ export default function SuperuserCompanyMng() {
     const loadAllPrograms = async () => {
         try {
             const data = await ProgramService.getPrograms()
-            setAllPrograms(data.filter((program) => program.isActive))
+            setAllPrograms(data)
         } catch (error) {
             console.error("프로그램 목록 로드 실패:", error)
         }
@@ -193,7 +193,7 @@ export default function SuperuserCompanyMng() {
 
     /* 프로그램ID별 해당 회사에 활성화 되어있는지 CHK */
     const isProgramConnected = (programId: string) => {
-        return companyPrograms.some((cp) => cp.programId === programId && cp.isActive)
+        return companyPrograms.some((cp) => cp.programId === programId)
     }
 
     return (

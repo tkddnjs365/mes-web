@@ -2,9 +2,7 @@ export interface Program {
   id: string
   name: string
   description: string
-  icon: string
   path: string
-  isActive: boolean
   createdAt: string
   updatedAt: string
 }
@@ -36,7 +34,6 @@ export interface CompanyProgram {
   id: string
   companyCode: string
   programId: string
-  isActive: boolean
   createdAt: string
   updatedAt: string
 }

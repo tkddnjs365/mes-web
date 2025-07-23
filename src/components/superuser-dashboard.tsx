@@ -3,6 +3,7 @@
 import {useAppContext} from "@/contexts/app-context";
 import {useState} from "react";
 import SuperuserCompanyMng from "./superuser-company-mng"
+import SuperuserProgMng from "@/components/superuser-prog-mng";
 
 type SuperMenuItem = "unified-company" | "program" | "menu"
 
@@ -12,8 +13,8 @@ export default function SuperuserDashboard() {
 
     const menuItems = [
         {id: "unified-company" as SuperMenuItem, name: "회사 관리", description: "회사 등록 및 관리자/프로그램 관리"},
-        {id: "program" as SuperMenuItem, name: "프로그램 등록", description: "MES 시스템에서 사용할 프로그램 등록"},
-        {id: "menu" as SuperMenuItem, name: "메뉴 등록", description: "네비게이션 메뉴 구조 관리"},
+        {id: "program" as SuperMenuItem, name: "프로그램 관리", description: "시스템에서 사용할 프로그램 관리"},
+        {id: "menu" as SuperMenuItem, name: "메뉴 관리", description: "네비게이션 메뉴 구조 관리"},
     ]
 
     const renderContent = () => {
@@ -21,7 +22,7 @@ export default function SuperuserDashboard() {
             case "unified-company":
                 return <SuperuserCompanyMng/>
             case "program":
-                return <SuperuserCompanyMng/>
+                return <SuperuserProgMng/>
             case "menu":
                 return <SuperuserCompanyMng/>
             default:
@@ -35,7 +36,7 @@ export default function SuperuserDashboard() {
                 <div className={"px-4 sm:px-6 lg:px-8"}>
                     <div className={"flex justify-between items-center h-16"}>
                         <div className={"flex items-center space-x-4"}>
-                            <h1 className={"text-xl font-bold text-gray-900"}>슈퍼관리자 시스템</h1>
+                            <h1 className={"text-xl font-bold text-gray-900"}>관리자 시스템</h1>
                             <span className={"text-sm text-gray-500"}>환영합니다, {currentSuperUser?.name}님</span>
                         </div>
                         <button onClick={logout}
