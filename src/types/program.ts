@@ -7,17 +7,14 @@ export interface Program {
   updatedAt: string
 }
 
-export interface Menu {
+export interface MenuCategory {
   id: string
-  programId: string
   name: string
-  path: string
-  icon: string
-  parentId?: string
-  order: number
-  isActive: boolean
   createdAt: string
   updatedAt: string
+  description: string
+  sortOrder: number
+  parentId: string
 }
 
 export interface UserProgram {
@@ -37,3 +34,12 @@ export interface CompanyProgram {
   createdAt: string
   updatedAt: string
 }
+
+export interface MenuLinkProgram {
+  id: string
+  menuId: string
+  programId: string
+  createdAt: string
+  updatedAt: string
+}
+

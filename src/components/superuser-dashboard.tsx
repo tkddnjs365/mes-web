@@ -4,6 +4,7 @@ import {useAppContext} from "@/contexts/app-context";
 import {useState} from "react";
 import SuperuserCompanyMng from "./superuser-company-mng"
 import SuperuserProgMng from "@/components/superuser-prog-mng";
+import SuperuserMenuMng from "@/components/superuser-menu-mng";
 
 type SuperMenuItem = "unified-company" | "program" | "menu"
 
@@ -24,7 +25,7 @@ export default function SuperuserDashboard() {
             case "program":
                 return <SuperuserProgMng/>
             case "menu":
-                return <SuperuserCompanyMng/>
+                return <SuperuserMenuMng/>
             default:
                 return <SuperuserCompanyMng/>
         }
