@@ -260,6 +260,30 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
         if (tabToClose && !tabToClose.closable) {
             return // 닫을 수 없는 탭은 닫지 않음
         }
+
+        // 닫을 탭 제외한 새 탭 배열 생성
+        const newTabs = openTabs.filter((tab) => tab.id !== tabId)
+
+        // 활성 탭 변경: 닫은 탭이 활성 탭이라면
+        let newActiveTab = activeTab
+        if (activeTab === tabId) {
+            if (newTabs.length > 0) {
+                // 닫은 탭 뒤에 탭이 있으면 그 탭을 활성화, 없으면 앞 탭 활성화
+                const closedTabIndex = openTabs.findIndex((tab) => tab.id === tabId)
+
+                if (closedTabIndex < newTabs.length) {
+                    newActiveTab = newTabs[closedTabIndex].id
+                } else {
+                    newActiveTab = newTabs[newTabs.length - 1].id
+                }
+            } else {
+                newActiveTab = "dashboard" // 기본 탭으로 변경
+            }
+        }
+
+        setOpenTabs(newTabs)
+        setActiveTab(newActiveTab)
+        saveTabsToStorage(newTabs, newActiveTab)
     }
 
     return (
@@ -381,27 +405,30 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                 {/* 메인 콘텐츠 */}
                 <main className={"flex-1 p-4 sm:p-6 overflow-hidden"}>
                     <div className={"h-full flex flex-col"}>
-                        <div className={"mb-4 flex border-b border-gray-200 overflow-x-auto"}>
+                        <div className={"mb-4 flex border-b border-gray-200 overflow-x-auto pb-3"}>
                             {openTabs.map((tab) => (
                                 <button
                                     key={tab.id}
-                                    className={`tab-trigger ${activeTab === tab.id ? "active" : ""}`}
-                                    onClick={() => {
-                                        setActiveTab(tab.id)
-                                        saveTabsToStorage(openTabs, tab.id)
-                                    }}
+                                    className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap min-w-max
+                                        ${activeTab === tab.id
+                                        ? "text-blue-600 border-blue-600"
+                                        : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
+                                    }`} onClick={() => {
+                                    setActiveTab(tab.id)
+                                    saveTabsToStorage(openTabs, tab.id)
+                                }}
                                 >
                                     <span className="truncate max-w-[120px] sm:max-w-none">{tab.title}</span>
                                     {tab.closable && (
-                                        <button
-                                            className="ml-2 text-gray-400 hover:text-gray-600 text-lg leading-none"
+                                        <span
+                                            className="mr-3 ml-1 text-gray-400 hover:text-gray-600 text-lg leading-none"
                                             onClick={(e) => {
                                                 e.stopPropagation()
                                                 closeTab(tab.id)
                                             }}
                                         >
                                             ×
-                                        </button>
+                                        </span>
                                     )}
                                 </button>
                             ))}
@@ -410,7 +437,8 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                         {openTabs.map((tab) => (
                             <div key={tab.id}
                                  className={`flex-1 overflow-hidden ${activeTab === tab.id ? "block" : "hidden"}`}>
-                                <div className="card h-full flex flex-col">
+                                <div
+                                    className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
                                     <div className="flex-1 overflow-y-auto">{tab.component}</div>
                                 </div>
                             </div>
