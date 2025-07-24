@@ -1,14 +1,14 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import type {User} from "@/types/user"
+import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
 
 // Mock 데이터 (Supabase가 설정되지 않은 경우 사용)
 const mockUsers: User[] = [
     {
         id: "user-1",
-        companyCode: "1",
+        companyCode: "1000",
         userId: "admin",
-        password: "admin123",
+        password: "admin",
         name: "관리자",
         role: "admin",
         permissions: ["all"],
@@ -79,8 +79,7 @@ const mockProgrmas2: ProgramWithDetails[] = [
         programId: 7,
     },
 ]
-
-//const mockPendingUsers: PendingUser[] = []
+const mockPendingUsers: PendingUser[] = []
 
 export class UserService {
     // 로그인
@@ -120,6 +119,212 @@ export class UserService {
         } catch (error) {
             console.error("로그인 오류:", error)
             return null
+        }
+    }
+
+    // 회원가입 요청
+    static async requestSignup(signupData: {
+        companyCode: string
+        userId: string
+        password: string
+        name: string
+    }): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                // Mock 데이터 사용
+                const existingUser = mockUsers.find(
+                    (u) => u.companyCode === signupData.companyCode && u.userId === signupData.userId,
+                )
+                const existingPending = mockPendingUsers.find(
+                    (u) => u.companyCode === signupData.companyCode && u.userId === signupData.userId,
+                )
+
+                if (existingUser || existingPending) return false
+
+                mockPendingUsers.push({
+                    id: Date.now().toString(),
+                    companyCode: signupData.companyCode,
+                    userId: signupData.userId,
+                    password: signupData.password,
+                    name: signupData.name,
+                    createdAt: new Date().toISOString(),
+                })
+                return true
+            }
+
+            const {error} = await supabase.from("pending_users").insert({
+                company_code: signupData.companyCode,
+                user_id: signupData.userId,
+                password: signupData.password,
+                name: signupData.name,
+            })
+
+            return !error
+        } catch (error) {
+            console.error("회원가입 요청 오류:", error)
+            return false
+        }
+    }
+
+    // 대기 중인 사용자 목록 조회
+    static async getPendingUsers(): Promise<PendingUser[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return mockPendingUsers
+            }
+
+            const {
+                data,
+                error
+            } = await supabase.from("pending_users").select("*").order("created_at", {ascending: false})
+
+            if (error || !data) return []
+
+            return data.map((user) => ({
+                id: user.id,
+                companyCode: user.company_code,
+                userId: user.user_id,
+                password: user.password,
+                name: user.name,
+                createdAt: user.created_at,
+            }))
+        } catch (error) {
+            console.error("대기 사용자 목록 조회 오류:", error)
+            return []
+        }
+    }
+
+    // 승인된 사용자 목록 조회
+    static async getApprovedUsers(companyCode?: string): Promise<User[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return companyCode ? mockUsers.filter((u) => u.companyCode === companyCode) : mockUsers
+            }
+
+            let query = supabase.from("users").select("*").eq("is_approved", true)
+
+            if (companyCode) {
+                query = query.eq("company_code", companyCode)
+            }
+
+            const {data, error} = await query.order("created_at", {ascending: false})
+
+            if (error || !data) return []
+
+            return data.map((user) => ({
+                id: user.id,
+                companyCode: user.company_code,
+                userId: user.user_id,
+                password: user.password,
+                name: user.name,
+                role: user.role,
+                permissions: user.permissions || [],
+                isApproved: user.is_approved,
+                createdAt: user.created_at,
+                updatedAt: user.updated_at,
+            }))
+        } catch (error) {
+            console.error("승인 사용자 목록 조회 오류:", error)
+            return []
+        }
+    }
+
+    // 사용자 승인
+    static async approveUser(pendingUserId: string): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                // Mock 데이터 사용
+                const pendingUserIndex = mockPendingUsers.findIndex((u) => u.id === pendingUserId)
+                if (pendingUserIndex === -1) return false
+
+                const pendingUser = mockPendingUsers[pendingUserIndex]
+                mockUsers.push({
+                    id: Date.now().toString(),
+                    companyCode: pendingUser.companyCode,
+                    userId: pendingUser.userId,
+                    password: pendingUser.password,
+                    name: pendingUser.name,
+                    role: "user",
+                    permissions: [],
+                    isApproved: true,
+                    createdAt: new Date().toISOString(),
+                })
+
+                mockPendingUsers.splice(pendingUserIndex, 1)
+                return true
+            }
+
+            // 대기 사용자 정보 조회
+            const {data: pendingUser, error: fetchError} = await supabase
+                .from("pending_users")
+                .select("*")
+                .eq("id", pendingUserId)
+                .single()
+
+            if (fetchError || !pendingUser) return false
+
+            // users 테이블에 추가
+            const {error: insertError} = await supabase.from("users").insert({
+                company_code: pendingUser.company_code,
+                user_id: pendingUser.user_id,
+                password: pendingUser.password,
+                name: pendingUser.name,
+                role: "user",
+                permissions: [],
+                is_approved: true,
+            })
+
+            if (insertError) return false
+
+            // pending_users 테이블에서 삭제
+            const {error: deleteError} = await supabase.from("pending_users").delete().eq("id", pendingUserId)
+
+            return !deleteError
+        } catch (error) {
+            console.error("사용자 승인 오류:", error)
+            return false
+        }
+    }
+
+    // 사용자 거부
+    static async rejectUser(pendingUserId: string): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                // Mock 데이터 사용
+                const pendingUserIndex = mockPendingUsers.findIndex((u) => u.id === pendingUserId)
+                if (pendingUserIndex === -1) return false
+
+                mockPendingUsers.splice(pendingUserIndex, 1)
+                return true
+            }
+
+            const {error} = await supabase.from("pending_users").delete().eq("id", pendingUserId)
+
+            return !error
+        } catch (error) {
+            console.error("사용자 거부 오류:", error)
+            return false
+        }
+    }
+
+    // 사용자 권한 업데이트
+    static async updateUserPermissions(userId: string, permissions: string[]): Promise<boolean> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                // Mock 데이터 사용
+                const userIndex = mockUsers.findIndex((u) => u.id === userId)
+                if (userIndex === -1) return false
+
+                mockUsers[userIndex].permissions = permissions
+                return true
+            }
+
+            const {error} = await supabase.from("users").update({permissions}).eq("id", userId)
+
+            return !error
+        } catch (error) {
+            console.error("권한 업데이트 오류:", error)
+            return false
         }
     }
 

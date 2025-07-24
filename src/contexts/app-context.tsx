@@ -110,9 +110,7 @@ export function AppProvider({children}: { children: ReactNode }) {
         name: string
     }): Promise<boolean> => {
         try {
-            /* return await UserService.requestSignup(signupData)*/
-            console.error("회원가입 요청 오류:")
-            return false
+             return await UserService.requestSignup(signupData)
         } catch (error) {
             console.error("회원가입 요청 오류:", error)
             return false

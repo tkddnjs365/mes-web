@@ -4,6 +4,7 @@ import {User} from "@/types/user";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import {useEffect, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
+import DashboardMain from "@/components/dashboard-main";
 
 interface DashboardProps {
     user: User
@@ -209,6 +210,66 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
         setCurrentUser(user)
         return () => setCurrentUser(null)
     }, [user, setCurrentUser])
+
+    // 컴포넌트 마운트 시 저장된 탭 상태 복원
+    useEffect(() => {
+        const restoreTabsFromStorage = () => {
+            try {
+                const savedTabs = localStorage.getItem("mes-open-tabs")
+                const savedActiveTab = localStorage.getItem("mes-active-tab")
+
+                if (savedTabs) {
+                    const parsedTabs = JSON.parse(savedTabs)
+                    const restoredTabs = parsedTabs.map((tabData: Tab) =>
+                        ({
+                            ...tabData,
+                            component: getComponentForMenu(tabData.id, tabData.title),
+                        }))
+
+                    // 대시보드 탭이 없으면 추가
+                    const hasDashboard = restoredTabs.some((tab: Tab) => tab.id === "dashboard")
+                    if (!hasDashboard) {
+                        const dashboardTab: Tab = {
+                            id: "dashboard",
+                            title: "대시보드",
+                            component: <DashboardMain/>,
+                            closable: false,
+                        }
+                        restoredTabs.unshift(dashboardTab)
+                    }
+
+                    setOpenTabs(restoredTabs)
+
+                    if (savedActiveTab && restoredTabs.some((tab: Tab) => tab.id === savedActiveTab)) {
+                        setActiveTab(savedActiveTab)
+                    } else {
+                        setActiveTab("dashboard")
+                    }
+                } else {
+                    // 저장된 탭이 없으면 기본 대시보드만 추가
+                    const dashboardTab: Tab = {
+                        id: "dashboard",
+                        title: "대시보드",
+                        component: <DashboardMain/>,
+                        closable: false,
+                    }
+                    setOpenTabs([dashboardTab])
+                }
+            } catch (error) {
+                console.error("탭 복원 중 오류:", error)
+                // 오류 발생 시 기본 대시보드 탭만 설정
+                const dashboardTab: Tab = {
+                    id: "dashboard",
+                    title: "대시보드",
+                    component: <DashboardMain/>,
+                    closable: false,
+                }
+                setOpenTabs([dashboardTab])
+            }
+        }
+
+        restoreTabsFromStorage()
+    }, [user])
 
     /* 실시간 시간 가져오기 */
     useEffect(() => {
