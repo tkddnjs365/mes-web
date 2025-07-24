@@ -102,6 +102,9 @@ export class UserService {
                 .eq("is_approved", true)
                 .single()
 
+            console.log("data : " + data)
+            console.log(error)
+
             if (error || !data) return null
 
             return {
@@ -363,7 +366,6 @@ export class UserService {
                 .from("company_programs")
                 .select("program_id")
                 .eq("company_code", companyCode)
-                .eq("is_active", true)
 
             if (error || !data) return []
 

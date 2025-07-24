@@ -25,8 +25,8 @@ export default function Login() {
         setIsLoading(true)
 
         try {
-            // 슈퍼유저 로그인 체크 (회사코드가 0000인 경우)
-            if (companyCode == "0000") {
+            // 슈퍼유저 로그인 체크 (회사코드가 super인 경우)
+            if (companyCode == "super") {
                 const success = await loginSuperUser(userId, password)
                 if (!success) {
                     alert("슈퍼관리자 로그인 정보가 올바르지 않습니다.")
