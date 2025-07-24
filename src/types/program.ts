@@ -43,3 +43,8 @@ export interface MenuLinkProgram {
   updatedAt: string
 }
 
+export interface ProgramWithDetails {
+  id: string
+  programId: number
+}
+
