@@ -42,7 +42,7 @@ export default function SuperuserMenuMng() {
             setPrograms(programsData)
             setAllCategories(categoriesData)
             setMainCategories(categoriesData.filter((data) => data.id === data.parentId)) // 대메뉴
-            setSubCategories(allCategories.filter((data: MenuCategory) => data.parentId === selectedMainCategory?.id && data.parentId !== data.id));
+            setSubCategories(categoriesData.filter((data: MenuCategory) => data.parentId === selectedMainCategory?.id && data.parentId !== data.id)); //중메뉴
         } catch (error) {
             console.error("데이터 로드 실패:", error)
         } finally {

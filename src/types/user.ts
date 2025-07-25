@@ -1,7 +1,8 @@
+/* users ( 사용자 정보 ) */
 export interface User {
   id: string
-  companyCode: string
-  userId: string
+  company_idx: string
+  user_id: string
   password: string
   name: string
   role: "admin" | "user" | "super"
@@ -11,15 +12,17 @@ export interface User {
   updatedAt?: string
 }
 
+/* super_users ( 슈퍼관리자 정보 )  */
 export interface SuperUser {
   id: string
-  userId: string
+  user_id: string
   password: string
   name: string
   permissions: string[]
   role: "super"
 }
 
+/* companies ( 회사 정보 ) */
 export interface Company {
   id: string
   code: string
@@ -30,21 +33,20 @@ export interface Company {
   description: string
 }
 
-export interface CompanyAdmin {
-  id: string
-  companyCode: string
-  userId: string
-  password: string
+export interface Company_Admin {
+  user_idx: string
+  company_idx: string
   name: string
-  isActive: boolean
+  user_id: string
   createdAt: string
-  updatedAt: string
+  company_code: string
 }
 
+/* pending_users ( 회원가입 요청 사용자 ) */
 export interface PendingUser {
   id: string
-  companyCode: string
-  userId: string
+  company_code: string
+  user_id: string
   password: string
   name: string
   createdAt: string

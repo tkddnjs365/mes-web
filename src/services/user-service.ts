@@ -1,32 +1,8 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
+import {mockCompanies, mockUsers} from "@/data/data";
 
-// Mock 데이터 (Supabase가 설정되지 않은 경우 사용)
-const mockUsers: User[] = [
-    {
-        id: "user-1",
-        companyCode: "1000",
-        userId: "admin",
-        password: "admin",
-        name: "관리자",
-        role: "admin",
-        permissions: ["all"],
-        isApproved: true,
-        createdAt: new Date().toISOString(),
-    },
-    {
-        id: "user-2",
-        companyCode: "1",
-        userId: "user1",
-        password: "user123",
-        name: "사용자1",
-        role: "user",
-        permissions: ["production", "quality"],
-        isApproved: true,
-        createdAt: new Date().toISOString(),
-    },
-]
 const mockProgrmas: ProgramWithDetails[] = [
     {
         id: "production",
@@ -87,20 +63,31 @@ export class UserService {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
+                const company = mockCompanies.find((c) => c.code === companyCode);
+                if (!company) return null;
+
                 const user = mockUsers.find(
-                    (u) => u.companyCode === companyCode && u.userId === userId && u.password === password && u.isApproved,
-                )
+                    (u) =>
+                        u.company_idx === company.id &&
+                        u.user_id === userId &&
+                        u.password === password &&
+                        u.isApproved
+                );
+
                 return user || null
             }
 
             const {data, error} = await supabase
                 .from("users")
-                .select("*")
-                .eq("company_code", companyCode)
+                .select(`*,
+                        companies:company_idx ( * )
+                        `)
+                .eq("companies.code", companyCode)
                 .eq("user_id", userId)
                 .eq("password", password)
                 .eq("is_approved", true)
-                .single()
+                .single();
+
 
             console.log("data : " + data)
             console.log(error)
@@ -109,8 +96,8 @@ export class UserService {
 
             return {
                 id: data.id,
-                companyCode: data.company_code,
-                userId: data.user_id,
+                company_idx: data.company_idx,
+                user_id: data.user_id,
                 password: data.password,
                 name: data.name,
                 role: data.role,
@@ -136,18 +123,19 @@ export class UserService {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
                 const existingUser = mockUsers.find(
-                    (u) => u.companyCode === signupData.companyCode && u.userId === signupData.userId,
+                    (u) => u.company_idx === signupData.companyCode && u.user_id === signupData.userId,
                 )
+                /*
                 const existingPending = mockPendingUsers.find(
-                    (u) => u.companyCode === signupData.companyCode && u.userId === signupData.userId,
+                    (u) => u.company_idx === signupData.companyCode && u.user_id === signupData.userId,
                 )
 
                 if (existingUser || existingPending) return false
-
+*/
                 mockPendingUsers.push({
                     id: Date.now().toString(),
-                    companyCode: signupData.companyCode,
-                    userId: signupData.userId,
+                    company_code: signupData.companyCode,
+                    user_id: signupData.userId,
                     password: signupData.password,
                     name: signupData.name,
                     createdAt: new Date().toISOString(),
@@ -182,7 +170,8 @@ export class UserService {
             } = await supabase.from("pending_users").select("*").order("created_at", {ascending: false})
 
             if (error || !data) return []
-
+            return []
+            /*
             return data.map((user) => ({
                 id: user.id,
                 companyCode: user.company_code,
@@ -191,6 +180,7 @@ export class UserService {
                 name: user.name,
                 createdAt: user.created_at,
             }))
+             */
         } catch (error) {
             console.error("대기 사용자 목록 조회 오류:", error)
             return []
@@ -200,6 +190,8 @@ export class UserService {
     // 승인된 사용자 목록 조회
     static async getApprovedUsers(companyCode?: string): Promise<User[]> {
         try {
+            return []
+            /*
             if (!isSupabaseConfigured || !supabase) {
                 return companyCode ? mockUsers.filter((u) => u.companyCode === companyCode) : mockUsers
             }
@@ -226,6 +218,7 @@ export class UserService {
                 createdAt: user.created_at,
                 updatedAt: user.updated_at,
             }))
+             */
         } catch (error) {
             console.error("승인 사용자 목록 조회 오류:", error)
             return []
@@ -235,6 +228,8 @@ export class UserService {
     // 사용자 승인
     static async approveUser(pendingUserId: string): Promise<boolean> {
         try {
+            return false
+            /*
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
                 const pendingUserIndex = mockPendingUsers.findIndex((u) => u.id === pendingUserId)
@@ -283,6 +278,7 @@ export class UserService {
             const {error: deleteError} = await supabase.from("pending_users").delete().eq("id", pendingUserId)
 
             return !deleteError
+             */
         } catch (error) {
             console.error("사용자 승인 오류:", error)
             return false

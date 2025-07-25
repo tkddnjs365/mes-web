@@ -1,76 +1,11 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import type {CompanyProgram, MenuCategory, MenuLinkProgram, Program} from "@/types/program"
-
-// Mock 데이터
-const mockPrograms: Program[] = [
-    {
-        id: '1',
-        name: '1프로그램명',
-        description: 'program.description || undefined',
-        path: 'program.path',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    {
-        id: '2',
-        name: '프로그램명2',
-        description: '222222',
-        path: 'program.path',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    {
-        id: '3',
-        name: '프로그램명3',
-        description: '222222',
-        path: 'program.path',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
-]
-const mockCompanyPrograms: CompanyProgram[] = []
-const mockMenuCategories: MenuCategory[] = [
-    {
-        id: "1",
-        name: "1번 이름",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        description: "1 설명",
-        sortOrder: 1,
-        parentId: "1",
-    },
-    {
-        id: "2",
-        name: "2번 이름",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        description: "2 설명",
-        sortOrder: 2,
-        parentId: "2",
-    },
-    {
-        id: "3",
-        name: "3번 이름",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        description: "3 설명",
-        sortOrder: 3,
-        parentId: "3",
-    },
-    {
-        id: "4",
-        name: "4번 이름",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        description: "4 설명",
-        sortOrder: 1,
-        parentId: "1",
-    }
-]
-const mockMenuPrograms: MenuLinkProgram[] = []
+import {mockCompanyPrograms, mockMenuCategories, mockMenuPrograms, mockPrograms} from "@/data/data";
+import {CompanyService} from "@/services/company-service";
 
 export class ProgramService {
-    // 프로그램 목록 조회
+
+    // 프로그램 목록 조회 (O)
     static async getPrograms(): Promise<Program[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -81,10 +16,12 @@ export class ProgramService {
 
             if (error || !data) return []
 
+            console.log("프로그램 목록 전체 조회 : ")
+            console.log(data)
+
             return data.map((program) => ({
                 id: program.id,
                 name: program.name,
-                icon: '',
                 description: program.description || undefined,
                 path: program.path,
                 isActive: program.is_active,
@@ -96,7 +33,7 @@ export class ProgramService {
         }
     }
 
-    // 프로그램 생성
+    // 프로그램 생성 (O)
     static async createProgram(programData: { name: string; path: string; description: string; }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -124,7 +61,7 @@ export class ProgramService {
         }
     }
 
-    // 프로그램 수정`
+    // 프로그램 수정 (O)
     static async updateProgram(
         programId: string,
         programData: {
@@ -161,7 +98,7 @@ export class ProgramService {
         }
     }
 
-    // 프로그램 삭제
+    // 프로그램 삭제 (O)
     static async deleteProgram(programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -180,7 +117,7 @@ export class ProgramService {
         }
     }
 
-    // 메뉴 카테고리 목록 조회
+    // 메뉴 카테고리 목록 조회 (O)
     static async getMenuCategories(): Promise<MenuCategory[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -188,9 +125,12 @@ export class ProgramService {
             }
 
             const {data, error} = await supabase
-                .from("menu_categories")
+                .from("menus")
                 .select("*")
-                .order("sort_order", {ascending: true})
+                .order("sortorder", {ascending: true})
+
+            console.log("메뉴 전체 조회 : ")
+            console.log(data)
 
             if (error || !data) return []
 
@@ -198,17 +138,17 @@ export class ProgramService {
                 id: category.id,
                 name: category.name,
                 description: category.description || undefined,
-                sortOrder: category.sort_order,
+                sortOrder: category.sortorder,
                 createdAt: category.created_at,
                 updatedAt: category.updated_at,
-                parentId: category.parentId,
+                parentId: category.parent_id,
             }))
         } catch {
             return []
         }
     }
 
-    // 메뉴 카테고리 생성
+    // 메뉴 카테고리 생성 (O)
     static async createMenuCategory(categoryData: {
         name: string
         description: string
@@ -235,19 +175,47 @@ export class ProgramService {
                 return true
             }
 
-            const {error} = await supabase.from("menu_categories").insert({
-                name: categoryData.name,
-                description: categoryData.description,
-                sort_order: categoryData.sortOrder,
-            })
+            if (categoryData.saveType === "main") {
+                /* 대메뉴 일때는 id와 parent_id를 동일하게 적용 */
+                const {data, error} = await supabase.from("menus").insert({
+                    name: categoryData.name,
+                    description: categoryData.description,
+                    sortorder: categoryData.sortOrder,
+                    parent_id: null
+                }).select('id').single();
 
-            return !error
+                if (error) {
+                    console.error(error);
+                    return false;
+                }
+
+                // 2. 반환된 id를 parent_id로 업데이트
+                const newId = data.id;
+
+                const {error: updateError} = await supabase.from("menus")
+                    .update({parent_id: newId})
+                    .eq("id", newId);
+
+                if (updateError) {
+                    console.error(updateError);
+                    return false;
+                }
+                return !error
+            } else {
+                const {error} = await supabase.from("menus").insert({
+                    name: categoryData.name,
+                    description: categoryData.description,
+                    sortorder: categoryData.sortOrder,
+                    parent_id: categoryData.parentId
+                });
+                return !error
+            }
         } catch {
             return false
         }
     }
 
-    // 중메뉴 프로그램 연결 조회
+    // 중메뉴 프로그램 연결 조회 (O)
     static async getMenuLihkPrograms(menuId: string): Promise<MenuLinkProgram[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -255,18 +223,20 @@ export class ProgramService {
             }
 
             const {data, error} = await supabase
-                .from("company_programs")
+                .from("menu_link_prog")
                 .select("*")
-                .eq("menuId", menuId)
+                .eq("menu_idx", menuId)
                 .order("created_at", {ascending: false})
+
+            console.log("중메뉴에 연결된 프로그램 조회 : ")
+            console.log(data)
 
             if (error || !data) return []
 
             return data.map((cp) => ({
                 id: cp.id,
-                menuId: cp.menuId,
-                programId: cp.program_id,
-                isActive: cp.is_active,
+                menuId: cp.menu_idx,
+                programId: cp.prog_idx,
                 createdAt: cp.created_at,
                 updatedAt: cp.updated_at,
             }))
@@ -275,7 +245,7 @@ export class ProgramService {
         }
     }
 
-    // 중메뉴-프로그램 연결
+    // 중메뉴-프로그램 연결 (O)
     static async connectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -294,9 +264,9 @@ export class ProgramService {
                 return true
             }
 
-            const {error} = await supabase.from("company_programs").insert({
-                menuId: menuId,
-                program_id: programId,
+            const {error} = await supabase.from("menu_link_prog").insert({
+                menu_idx: menuId,
+                prog_idx: programId,
             })
 
             return !error
@@ -305,7 +275,7 @@ export class ProgramService {
         }
     }
 
-    // 중메뉴-프로그램 연결 해제
+    // 중메뉴-프로그램 연결 해제 (O)
     static async disconnectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -319,10 +289,10 @@ export class ProgramService {
             }
 
             const {error} = await supabase
-                .from("company_programs")
+                .from("menu_link_prog")
                 .delete()
-                .eq("company_code", menuId)
-                .eq("program_id", programId)
+                .eq("menu_idx", menuId)
+                .eq("prog_idx", programId)
 
             return !error
         } catch {
@@ -330,7 +300,7 @@ export class ProgramService {
         }
     }
 
-    // 회사별 프로그램 연결 조회
+    // 회사별 프로그램 연결 조회 (O)
     static async getCompanyPrograms(companyCode: string): Promise<CompanyProgram[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -338,7 +308,7 @@ export class ProgramService {
             }
 
             const {data, error} = await supabase
-                .from("company_programs")
+                .from("v_prog_company")
                 .select("*")
                 .eq("company_code", companyCode)
                 .order("created_at", {ascending: false})
@@ -346,10 +316,9 @@ export class ProgramService {
             if (error || !data) return []
 
             return data.map((cp) => ({
-                id: cp.id,
+                id: cp.link_idx,
                 companyCode: cp.company_code,
-                programId: cp.program_id,
-                isActive: cp.is_active,
+                programId: cp.prog_idx,
                 createdAt: cp.created_at,
                 updatedAt: cp.updated_at,
             }))
@@ -358,7 +327,7 @@ export class ProgramService {
         }
     }
 
-    // 회사-프로그램 연결
+    // 회사-프로그램 연결 (O)
     static async connectCompanyProgram(companyCode: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -375,9 +344,18 @@ export class ProgramService {
                 return true
             }
 
-            const {error} = await supabase.from("company_programs").insert({
-                company_code: companyCode,
-                program_id: programId,
+            // 회사 정보 가져오기
+            const comp_data = await CompanyService.getCompanies_code(companyCode)
+            if (!comp_data) {
+                console.error("회사 조회 실패:", comp_data);
+                return false;
+            }
+
+            const company_idx = comp_data[0].id;
+
+            const {error} = await supabase.from("prog_link_company").insert({
+                company_idx: company_idx,
+                prog_idx: programId,
             })
 
             return !error
@@ -399,11 +377,20 @@ export class ProgramService {
                 return true
             }
 
+            // 회사 정보 가져오기
+            const comp_data = await CompanyService.getCompanies_code(companyCode)
+            if (!comp_data) {
+                console.error("회사 조회 실패:", comp_data);
+                return false;
+            }
+
+            const company_idx = comp_data[0].id;
+
             const {error} = await supabase
-                .from("company_programs")
+                .from("prog_link_company")
                 .delete()
-                .eq("company_code", companyCode)
-                .eq("program_id", programId)
+                .eq("company_idx", company_idx)
+                .eq("prog_idx", programId)
 
             return !error
         } catch {

@@ -1,3 +1,4 @@
+/* programs */
 export interface Program {
   id: string
   name: string
@@ -7,6 +8,7 @@ export interface Program {
   updatedAt: string
 }
 
+/* menus */
 export interface MenuCategory {
   id: string
   name: string
@@ -27,6 +29,7 @@ export interface UserProgram {
   updatedAt: string
 }
 
+/* prog_link_company */
 export interface CompanyProgram {
   id: string
   companyCode: string
@@ -35,6 +38,7 @@ export interface CompanyProgram {
   updatedAt: string
 }
 
+/* menu_link_prog */
 export interface MenuLinkProgram {
   id: string
   menuId: string

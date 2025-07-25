@@ -3,8 +3,9 @@
 import {useEffect, useState} from "react"
 import {SuperUserService} from "@/services/super-user-service"
 import {ProgramService} from "@/services/program-service"
-import type {Company, CompanyAdmin} from "@/types/user"
+import type {Company, Company_Admin} from "@/types/user"
 import type {CompanyProgram, Program} from "@/types/program"
+import {CompanyService} from "@/services/company-service";
 
 export default function SuperuserCompanyMng() {
     const [companies, setCompanies] = useState<Company[]>([]) // 회사 목록
@@ -12,7 +13,7 @@ export default function SuperuserCompanyMng() {
     const [activeTab, setActiveTab] = useState<"admins" | "programs">("admins") // 선택된 탭
 
     // 관리자 관련 상태
-    const [companyAdmins, setCompanyAdmins] = useState<CompanyAdmin[]>([]) // 회사별 관리자
+    const [companyAdmins, setCompanyAdmins] = useState<Company_Admin[]>([]) // 회사별 관리자
     const [isAdminDialogOpen, setIsAdminDialogOpen] = useState(false) // 괸리자 추가 버튼 클릭 여부
 
     // 프로그램 관련 상태
@@ -45,7 +46,7 @@ export default function SuperuserCompanyMng() {
     const loadCompanies = async () => {
         setIsLoading(true)
         try {
-            const data = await SuperUserService.getCompanies()
+            const data = await CompanyService.getCompanies()
             setCompanies(data.filter((company) => company.isActive))
         } catch (error) {
             console.error("회사 목록 로드 실패:", error)
@@ -68,6 +69,8 @@ export default function SuperuserCompanyMng() {
     const loadCompanyAdmins = async (companyCode: string) => {
         try {
             const data = await SuperUserService.getCompanyAdmins(companyCode)
+            console.log("선택된 회사별 관리자 : ")
+            console.log(data)
             setCompanyAdmins(data)
         } catch (error) {
             console.error("관리자 목록 로드 실패:", error)
@@ -78,6 +81,8 @@ export default function SuperuserCompanyMng() {
     const loadCompanyPrograms = async (companyCode: string) => {
         try {
             const data = await ProgramService.getCompanyPrograms(companyCode)
+            console.log("선택된 회사의 프로그램 : ")
+            console.log(data)
             setCompanyPrograms(data)
         } catch (error) {
             console.error("회사 프로그램 목록 로드 실패:", error)
@@ -315,19 +320,19 @@ export default function SuperuserCompanyMng() {
                                         ) : (
                                             <div className="space-y-2">
                                                 {companyAdmins.map((admin) => (
-                                                    <div key={admin.id}
+                                                    <div key={admin.user_idx}
                                                          className="p-4 border border-gray-200 rounded-lg">
                                                         <div className="flex items-center justify-between">
                                                             <div>
                                                                 <div className="font-semibold">{admin.name}</div>
                                                                 <div
-                                                                    className="text-sm text-gray-600">ID: {admin.userId}</div>
+                                                                    className="text-sm text-gray-600">ID: {admin.user_id}</div>
                                                                 <div className="text-xs text-gray-500">
                                                                     등록일: {new Date(admin.createdAt).toLocaleDateString("ko-KR")}
                                                                 </div>
                                                             </div>
                                                             <button
-                                                                onClick={() => handleDeleteAdmin(admin.id)}
+                                                                onClick={() => handleDeleteAdmin(admin.user_idx)}
                                                                 className="px-3 py-1 text-sm min-h-[36px] rounded-md font-medium transition-all cursor-pointer border border-gray-300 flex items-center justify-center bg-red-600 text-white hover:bg-red-700"
                                                                 disabled={isLoading}
                                                             >

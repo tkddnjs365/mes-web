@@ -1,50 +1,16 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import type {Company, CompanyAdmin, SuperUser} from "@/types/user"
-
-// Mock 데이터 (Supabase가 설정되지 않은 경우 사용)
-const mockSuperUsers: SuperUser[] = [
-    {
-        id: "super-1",
-        userId: "1",
-        password: "1",
-        name: "슈퍼관리자",
-        permissions: ["all"],
-        role: "super",
-    },
-]
-
-const mockCompanies: Company[] = [
-    {
-        id: "comp-1",
-        code: "COMP001",
-        name: "테스트 회사",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        description: '테스트 회사 desc',
-    },
-]
-
-const mockCompanyAdmins: CompanyAdmin[] = [
-    {
-        id: "admin-1",
-        companyCode: "COMP001",
-        userId: "admin",
-        password: "admin123",
-        name: "관리자",
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-]
+import {Company_Admin, SuperUser} from "@/types/user"
+import {mockCompanies, mockCompanyAdmins, mockSuperUsers} from "@/data/data";
+import {CompanyService} from "@/services/company-service";
 
 export class SuperUserService {
-    // 슈퍼유저 로그인
+
+    // 슈퍼유저 로그인 (O)
     static async loginSuperUser(userId: string, password: string): Promise<SuperUser | null> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
-                const superUser = mockSuperUsers.find((u) => u.userId === userId && u.password === password)
+                const superUser = mockSuperUsers.find((u) => u.user_id === userId && u.password === password)
                 return superUser || null
             }
 
@@ -59,7 +25,7 @@ export class SuperUserService {
 
             return {
                 id: data.id,
-                userId: data.user_id,
+                user_id: data.user_id,
                 password: data.password,
                 name: data.name,
                 permissions: data.permissions || [],
@@ -71,63 +37,7 @@ export class SuperUserService {
         }
     }
 
-    // 회사 관리자 목록 조회
-    static async getCompanyAdmins(companyCode: string): Promise<CompanyAdmin[]> {
-        try {
-            if (!isSupabaseConfigured || !supabase) {
-                return mockCompanyAdmins.filter((cp) => cp.companyCode === companyCode)
-            }
-
-            const {data, error} = await supabase
-                .from("company_admins")
-                .select("*")
-                .order("created_at", {ascending: false})
-
-            if (error || !data) return []
-
-            return data.map((admin) => ({
-                id: admin.id,
-                companyCode: admin.company_code,
-                userId: admin.user_id,
-                password: admin.password,
-                name: admin.name,
-                isActive: admin.is_active,
-                createdAt: admin.created_at,
-                updatedAt: admin.updated_at,
-            }))
-        } catch (error) {
-            console.error("회사 관리자 목록 조회 오류:", error)
-            return []
-        }
-    }
-
-    // 회사 목록 조회
-    static async getCompanies(): Promise<Company[]> {
-        try {
-            if (!isSupabaseConfigured || !supabase) {
-                return mockCompanies
-            }
-
-            const {data, error} = await supabase.from("companies").select("*").order("created_at", {ascending: false})
-
-            if (error || !data) return []
-
-            return data.map((company) => ({
-                id: company.id,
-                code: company.code,
-                name: company.name,
-                isActive: company.is_active,
-                createdAt: company.created_at,
-                updatedAt: company.updated_at,
-                description: company.description,
-            }))
-        } catch (error) {
-            console.error("회사 목록 조회 오류:", error)
-            return []
-        }
-    }
-
-    // 회사 추가
+    // 회사 추가 (O)
     static async createCompany(companyData: { code: string; name: string; description: string }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -150,6 +60,7 @@ export class SuperUserService {
             const {error} = await supabase.from("companies").insert({
                 code: companyData.code,
                 name: companyData.name,
+                description: companyData.description,
             })
 
             return !error
@@ -159,7 +70,7 @@ export class SuperUserService {
         }
     }
 
-    // 회사 관리자 추가
+    // 회사 관리자 추가 (O)
     static async createCompanyAdmin(adminData: {
         companyCode: string;
         userId: string;
@@ -169,43 +80,48 @@ export class SuperUserService {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
+                const companyObj = mockCompanies.find(comp => comp.code === adminData.companyCode);
+                if (!companyObj) {
+                    // 회사가 없으면 false 반환 또는 에러 처리
+                    return false;
+                }
+
                 const existingAdmin = mockCompanyAdmins.find(
-                    (a) => a.companyCode === adminData.companyCode && a.userId === adminData.userId,
+                    (a) => a.company_code === adminData.companyCode && a.user_id === adminData.userId,
                 )
                 if (existingAdmin) return false
 
                 mockCompanyAdmins.push({
-                    id: Date.now().toString(),
-                    companyCode: adminData.companyCode,
-                    userId: adminData.userId,
-                    password: adminData.password,
+                    user_idx: Date.now().toString(),
+                    user_id: adminData.userId,
                     name: adminData.name,
-                    isActive: true,
                     createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
+                    company_code: adminData.companyCode,
+                    company_idx: companyObj.id,
                 })
                 return true
             }
 
-            // company_admins 테이블에 추가
-            const {error: adminError} = await supabase.from("company_admins").insert({
-                company_code: adminData.companyCode,
-                user_id: adminData.userId,
-                password: adminData.password,
-                name: adminData.name,
-            })
+            // 회사 정보 가져오기
+            const comp_data = await CompanyService.getCompanies_code(adminData.companyCode)
+            if (!comp_data) {
+                console.error("회사 조회 실패:", comp_data);
+                return false;
+            }
 
-            if (adminError) return false
+            const company_idx = comp_data[0].id;
 
             // users 테이블에도 추가 (로그인을 위해)
             const {error: userError} = await supabase.from("users").insert({
-                company_code: adminData.companyCode,
                 user_id: adminData.userId,
                 password: adminData.password,
                 name: adminData.name,
                 role: "admin",
-                permissions: ["all"],
+                permissions: JSON.stringify(["all"]),
                 is_approved: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                company_idx: company_idx
             })
 
             return !userError
@@ -215,12 +131,46 @@ export class SuperUserService {
         }
     }
 
-    // 회사 관리자 삭제
+    // 회사 관리자 목록 조회 (O)
+    static async getCompanyAdmins(companyCode: string): Promise<Company_Admin[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return []
+            }
+
+            const {data, error} = await supabase
+                .from("v_user_company")
+                .select("*")
+                .eq("company_code", companyCode)
+                .order("user_created_at", {ascending: false});
+
+            console.log("회사별 관리자 조회 DATA : ")
+            console.log("companyCode : " + companyCode)
+            console.log(data)
+
+            if (error || !data) return [];
+
+            return data.map((user) => ({
+                user_idx: user.user_idx,
+                user_id: user.user_id,
+                name: user.name,
+                createdAt: user.created_at,
+                company_idx: user.companies?.[0]?.id ?? null, // ← 배열에서 첫 번째 접근
+                company_code: user.companies?.[0]?.code ?? null,
+            }));
+
+        } catch (error) {
+            console.error("회사 관리자 목록 조회 오류:", error)
+            return []
+        }
+    }
+
+    // 회사 관리자 삭제 (O)
     static async deleteCompanyAdmin(adminId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 사용
-                const adminIndex = mockCompanyAdmins.findIndex((a) => a.id === adminId)
+                const adminIndex = mockCompanyAdmins.findIndex((a) => a.user_id === adminId)
                 if (adminIndex === -1) return false
 
                 mockCompanyAdmins.splice(adminIndex, 1)
@@ -229,24 +179,18 @@ export class SuperUserService {
 
             // 먼저 관리자 정보 조회
             const {data: admin, error: fetchError} = await supabase
-                .from("company_admins")
+                .from("users")
                 .select("*")
                 .eq("id", adminId)
                 .single()
 
             if (fetchError || !admin) return false
 
-            // company_admins 테이블에서 삭제
-            const {error: adminError} = await supabase.from("company_admins").delete().eq("id", adminId)
-
-            if (adminError) return false
-
             // users 테이블에서도 삭제
             const {error: userError} = await supabase
                 .from("users")
                 .delete()
-                .eq("company_code", admin.company_code)
-                .eq("user_id", admin.user_id)
+                .eq("id", adminId)
                 .eq("role", "admin")
 
             return !userError
