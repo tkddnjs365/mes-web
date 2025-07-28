@@ -2,19 +2,13 @@
 
 import {useEffect, useState} from "react"
 import type {User} from "@/types/user"
-import type {ProgramWithDetails} from "@/types/program"
+import type {MenuItem, ProgramWithDetails} from "@/types/program"
 import {UserService} from "@/services/user-service"
+import {ProgramService} from "@/services/program-service";
 
 interface SidebarProps {
     user: User
     onMenuClick: (menuId: string, title: string) => void
-}
-
-interface MenuItem {
-    id: string
-    title: string
-    children?: MenuItem[]
-    programId?: number
 }
 
 export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
@@ -22,6 +16,16 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
     const [userPrograms, setUserPrograms] = useState<ProgramWithDetails[]>([])
     const [companyPrograms, setCompanyPrograms] = useState<ProgramWithDetails[]>([])
     const [loading, setLoading] = useState(true)
+    const [filteredMenus, setFilteredMenus] = useState<MenuItem[]>([])
+
+    useEffect(() => {
+        const loadMenus = async () => {
+            const menus = await getFilteredMenuItems()
+            setFilteredMenus(menus)
+        }
+
+        loadMenus()
+    }, [companyPrograms])
 
     // 사용자 프로그램 조회
     useEffect(() => {
@@ -52,86 +56,9 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
         }
     }, [user])
 
-    // 전체 메뉴 구조 정의
-    const getAllMenuItems = (): MenuItem[] => [
-        {
-            id: "system",
-            title: "시스템관리",
-            children: [
-                {
-                    id: "basic",
-                    title: "기준관리",
-                    children: [
-                        {id: "user-management", title: "사용자관리", programId: 1},
-                        {id: "item-management", title: "품목관리", programId: 2},
-                        {id: "item-status", title: "품목현황", programId: 3},
-                        {id: "customer-management", title: "거래처관리", programId: 4},
-                        {id: "department-management", title: "부서관리", programId: 5},
-                    ],
-                },
-            ],
-        },
-        {
-            id: "sales",
-            title: "영업관리",
-            children: [
-                {
-                    id: "order",
-                    title: "수주관리",
-                    children: [
-                        {id: "order-management", title: "수주관리", programId: 6},
-                        {id: "order-status", title: "수주현황", programId: 7},
-                    ],
-                },
-                {
-                    id: "ship",
-                    title: "출고관리",
-                    children: [
-                        {id: "delivery-management", title: "출고관리", programId: 8},
-                        {id: "delivery-status", title: "출고현황", programId: 9},
-                    ],
-                },
-            ],
-
-        },
-        {
-            id: "production",
-            title: "생산관리",
-            children: [
-                {id: "production-management", title: "생산관리", programId: 10},
-                {id: "production-plan", title: "생산계획수립", programId: 11},
-                {id: "production-schedule", title: "생산일정관리", programId: 12},
-                {id: "production-status", title: "생산현황", programId: 13},
-                {id: "production-result", title: "생산실적", programId: 14},
-            ],
-        },
-        {
-            id: "quality",
-            title: "품질관리",
-            children: [
-                {id: "quality-management", title: "품질관리", programId: 15},
-                {id: "quality-result", title: "검사결과", programId: 16},
-                {id: "defect-management", title: "불량관리", programId: 17},
-                {id: "spc-analysis", title: "SPC분석", programId: 18},
-                {id: "quality-report", title: "품질보고서", programId: 19},
-            ],
-        },
-        {
-            id: "equipment",
-            title: "설비관리",
-            children: [
-                {id: "equipment-management", title: "설비관리", programId: 20},
-                {id: "equipment-monitoring", title: "설비모니터링", programId: 21},
-                {id: "preventive-maintenance", title: "예방보전", programId: 22},
-                {id: "maintenance-history", title: "보전이력", programId: 23},
-            ],
-        },
-    ]
-
     // 사용자 권한에 따른 메뉴 필터링
-    const getFilteredMenuItems = (): MenuItem[] => {
-        const allMenus = getAllMenuItems()
-
+    const getFilteredMenuItems = async (): Promise<MenuItem[]> => {
+        const allMenus = await ProgramService.getAllMenuItems()
         if (user.role === "super") {
             // 슈퍼유저는 모든 메뉴 접근 가능
             return allMenus
@@ -222,7 +149,6 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
         )
     }
 
-    const filteredMenus = getFilteredMenuItems()
     const availableProgramsCount = user.role === "admin" ? companyPrograms.length : userPrograms.length
 
     return (

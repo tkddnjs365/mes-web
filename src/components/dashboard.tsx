@@ -4,7 +4,8 @@ import {User} from "@/types/user";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import {useEffect, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
-import DashboardMain from "@/components/dashboard-main";
+import {ProgramService} from "@/services/program-service";
+import {DashBoardMain} from "@/components/dashboard-main"
 
 interface DashboardProps {
     user: User
@@ -14,188 +15,8 @@ interface DashboardProps {
 interface Tab {
     id: string
     title: string
-    component: React.ReactNode
+    component: React.ComponentType
     closable: boolean
-}
-
-const getComponentForMenu = (menuId: string, title: string) => {
-    switch (menuId) {
-        case "user-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">수주현황</h2>
-                    <p>수주현황 화면입니다.</p>
-                </div>
-            )
-        case "item-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">수주현황</h2>
-                    <p>수주현황 화면입니다.</p>
-                </div>
-            )
-        case "item-status":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">품목현황</h2>
-                    <p>품목현황 화면입니다.</p>
-                </div>
-            )
-        case "order-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">수주현황</h2>
-                    <p>수주현황 화면입니다.</p>
-                </div>
-            )
-        case "order-status":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">수주현황</h2>
-                    <p>수주현황 화면입니다.</p>
-                </div>
-            )
-        case "delivery-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">출고관리</h2>
-                    <p>출고관리 화면입니다.</p>
-                </div>
-            )
-        case "delivery-status":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">출고현황</h2>
-                    <p>출고현황 화면입니다.</p>
-                </div>
-            )
-        case "customer-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">거래처관리</h2>
-                    <p>거래처관리 화면입니다.</p>
-                </div>
-            )
-        case "department-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">부서관리</h2>
-                    <p>부서관리 화면입니다.</p>
-                </div>
-            )
-        case "program-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">프로그램 추가</h2>
-                    <p>프로그램 추가 화면입니다.</p>
-                </div>
-            )
-        case "production-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">프로그램 추가</h2>
-                    <p>프로그램 추가 화면입니다.</p>
-                </div>
-            )
-        case "quality-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">프로그램 추가</h2>
-                    <p>프로그램 추가 화면입니다.</p>
-                </div>
-            )
-        case "equipment-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">프로그램 추가</h2>
-                    <p>프로그램 추가 화면입니다.</p>
-                </div>
-            )
-        case "production-plan":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">생산계획수립</h2>
-                    <p>생산계획수립 화면입니다.</p>
-                </div>
-            )
-        case "production-schedule":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">생산일정관리</h2>
-                    <p>생산일정관리 화면입니다.</p>
-                </div>
-            )
-        case "production-status":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">생산현황</h2>
-                    <p>생산현황 화면입니다.</p>
-                </div>
-            )
-        case "production-result":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">생산실적</h2>
-                    <p>생산실적 화면입니다.</p>
-                </div>
-            )
-        case "quality-result":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">검사결과</h2>
-                    <p>검사결과 화면입니다.</p>
-                </div>
-            )
-        case "defect-management":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">불량관리</h2>
-                    <p>불량관리 화면입니다.</p>
-                </div>
-            )
-        case "spc-analysis":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">SPC분석</h2>
-                    <p>SPC분석 화면입니다.</p>
-                </div>
-            )
-        case "quality-report":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">품질보고서</h2>
-                    <p>품질보고서 화면입니다.</p>
-                </div>
-            )
-        case "equipment-monitoring":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">설비모니터링</h2>
-                    <p>설비모니터링 화면입니다.</p>
-                </div>
-            )
-        case "preventive-maintenance":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">예방보전</h2>
-                    <p>예방보전 화면입니다.</p>
-                </div>
-            )
-        case "maintenance-history":
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">보전이력</h2>
-                    <p>보전이력 화면입니다.</p>
-                </div>
-            )
-        default:
-            return (
-                <div className="p-4">
-                    <h2 className="text-xl font-bold">{title}</h2>
-                    <p>{title} 화면입니다.</p>
-                </div>
-            )
-    }
 }
 
 export default function Dashboard({user, onLogout}: DashboardProps) {
@@ -213,36 +34,48 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
 
     // 컴포넌트 마운트 시 저장된 탭 상태 복원
     useEffect(() => {
-        const restoreTabsFromStorage = () => {
+        const restoreTabsFromStorage = async () => {
             try {
+                /* 로컬 스토리지에서 저장 값 가져오기 */
                 const savedTabs = localStorage.getItem("mes-open-tabs")
                 const savedActiveTab = localStorage.getItem("mes-active-tab")
 
+                /* 복원된 탭을 담을 배열 */
+                const restoredTabs: Tab[] = [];
+
+                /* 저장된 탭이 있는 경우 */
                 if (savedTabs) {
                     const parsedTabs = JSON.parse(savedTabs)
-                    const restoredTabs = parsedTabs.map((tabData: Tab) =>
-                        ({
-                            ...tabData,
-                            component: getComponentForMenu(tabData.id, tabData.title),
-                        }))
 
-                    // 대시보드 탭이 없으면 추가
+                    /* 각 탭 데이터를 동적으로 로딩*/
+                    for (const tabData of parsedTabs) {
+                        const component = await ProgramService.getProgram_progIdx(tabData.id);
+                        if (component !== null)
+                            restoredTabs.push({
+                                ...tabData,
+                                component,
+                            });
+                    }
+
+                    // 복원된 탭 중에 대시보드가 없으면 기본 대시보드 탭을 추가
                     const hasDashboard = restoredTabs.some((tab: Tab) => tab.id === "dashboard")
                     if (!hasDashboard) {
                         const dashboardTab: Tab = {
                             id: "dashboard",
                             title: "대시보드",
-                            component: <DashboardMain/>,
-                            closable: false,
+                            component: DashBoardMain,
+                            closable: false, // 닫을수 없도록 설정
                         }
-                        restoredTabs.unshift(dashboardTab)
+                        restoredTabs.unshift(dashboardTab) // 맨 앞에 추가
                     }
 
                     setOpenTabs(restoredTabs)
 
+                    // 저장된 활성 탭이 있고, 복원된 탭 목록에 존재하면 활성화
                     if (savedActiveTab && restoredTabs.some((tab: Tab) => tab.id === savedActiveTab)) {
                         setActiveTab(savedActiveTab)
                     } else {
+                        // 없으면 기본 대시보드 탭을 활성화
                         setActiveTab("dashboard")
                     }
                 } else {
@@ -250,7 +83,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                     const dashboardTab: Tab = {
                         id: "dashboard",
                         title: "대시보드",
-                        component: <DashboardMain/>,
+                        component: DashBoardMain,
                         closable: false,
                     }
                     setOpenTabs([dashboardTab])
@@ -261,7 +94,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                 const dashboardTab: Tab = {
                     id: "dashboard",
                     title: "대시보드",
-                    component: <DashboardMain/>,
+                    component: DashBoardMain,
                     closable: false,
                 }
                 setOpenTabs([dashboardTab])
@@ -281,7 +114,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
     }, [])
 
     /* 프로그램 탭으로 오픈 */
-    const openTab = (id: string, title: string, component: React.ReactNode) => {
+    const openTab = (id: string, title: string, component: React.ComponentType) => {
         const existingTab = openTabs.find((tab) => tab.id === id) // 이미 활성화된 탭인지 확인
 
         let newTabs = openTabs
@@ -353,10 +186,14 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
             <div className={"hidden lg:block"}>
                 <DashboardSidebar
                     user={user}
-                    onMenuClick={(menuId, title) => {
-                        const component = getComponentForMenu(menuId, title)
-                        openTab(menuId, title, component)
-                    }}/>
+                    onMenuClick={(prog_path, title) => {
+                        (async () => {
+                            const Component = await ProgramService.getProgram_progIdx(prog_path);
+                            if (Component !== null)
+                                openTab(prog_path, title, Component);
+                        })();
+                    }}
+                />
             </div>
 
             {/* 모바일 사이드바 오버레이 */}
@@ -368,9 +205,12 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                 className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg -translate-x-full transition-transform duration-300 ease-in-out z-50 ${isSidebarOpen ? "open" : "closed"} lg:hidden`}>
                 <DashboardSidebar
                     user={user}
-                    onMenuClick={(menuId, title) => {
-                        const component = getComponentForMenu(menuId, title)
-                        openTab(menuId, title, component)
+                    onMenuClick={(prog_path, title) => {
+                        (async () => {
+                            const Component = await ProgramService.getProgram_progIdx(prog_path);
+                            if (Component !== null)
+                                openTab(prog_path, title, Component);
+                        })();
                     }}
                 />
             </div>
@@ -495,12 +335,15 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                             ))}
                         </div>
 
+
                         {openTabs.map((tab) => (
                             <div key={tab.id}
                                  className={`flex-1 overflow-hidden ${activeTab === tab.id ? "block" : "hidden"}`}>
                                 <div
                                     className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
-                                    <div className="flex-1 overflow-y-auto">{tab.component}</div>
+                                    <div className="flex-1 overflow-y-auto">
+                                        <tab.component/>
+                                    </div>
                                 </div>
                             </div>
                         ))}

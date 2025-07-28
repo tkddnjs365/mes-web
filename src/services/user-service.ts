@@ -351,7 +351,7 @@ export class UserService {
     }
 
     // 회사별 프로그램 조회
-    static async getCompanyPrograms(companyCode: string): Promise<ProgramWithDetails[]> {
+    static async getCompanyPrograms(company_idx: string): Promise<ProgramWithDetails[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 // Mock 데이터 반환
@@ -359,13 +359,16 @@ export class UserService {
             }
 
             const {data, error} = await supabase
-                .from("company_programs")
-                .select("program_id")
-                .eq("company_code", companyCode)
+                .from("v_prog_company")
+                .select("prog_idx, link_idx")
+                .eq("company_idx", company_idx)
 
             if (error || !data) return []
 
-            return data.map((item) => item.program_id)
+            return data.map((item) => ({
+                id: item.link_idx,
+                programId: item.prog_idx
+            }));
         } catch (error) {
             console.error("회사 프로그램 조회 오류:", error)
             return []

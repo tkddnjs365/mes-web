@@ -1,7 +1,12 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import type {CompanyProgram, MenuCategory, MenuLinkProgram, Program} from "@/types/program"
+import type {CompanyProgram, MenuCategory, MenuItem, MenuLinkProgram, Program} from "@/types/program"
 import {mockCompanyPrograms, mockMenuCategories, mockMenuPrograms, mockPrograms} from "@/data/data";
 import {CompanyService} from "@/services/company-service";
+import {DashBoardMain} from "@/components/dashboard-main"
+
+const componentMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
+    "user-mng": () => import("@/components/pages/user-mng"),
+};
 
 export class ProgramService {
 
@@ -58,6 +63,32 @@ export class ProgramService {
             return !error
         } catch {
             return false
+        }
+    }
+
+    // 프로그램 오픈
+    static async getProgram_progIdx(prog_path: string): Promise<React.ComponentType | null> {
+        try {
+            const normalizedPath = prog_path
+                .replace(".tsx", "")
+                .replace("/components/pages/", "");
+
+            if (prog_path === "dashboard") {
+                return DashBoardMain
+            }
+
+            console.log("normalizedPath : " + normalizedPath)
+
+            const loader = componentMap[normalizedPath];
+            if (loader) {
+                const page_moduel = await loader();
+                return page_moduel.default;
+            }
+
+            alert("프로그램 정보를 확인하세요.")
+            return null
+        } catch {
+            return null
         }
     }
 
@@ -397,4 +428,74 @@ export class ProgramService {
             return false
         }
     }
+
+    // 사이드바 메뉴 조회
+    static getAllMenuItems = async (): Promise<MenuItem[]> => {
+
+        if (!isSupabaseConfigured || !supabase) {
+            return []
+        }
+
+        // 1. 모든 메뉴 조회
+        const {data: menus, error: menuError} = await supabase
+            .from("menus")
+            .select("*")
+            .order("sortorder", {ascending: true});
+
+        // 2. 메뉴-프로그램 연결 정보와 프로그램 정보 조회
+        const {data: menuPrograms, error: linkError} = await supabase
+            .from("menu_link_prog")
+            .select(`
+            menu_idx,
+            programs (
+                id,
+                name,
+                path
+            )
+        `);
+
+        if (menuError || linkError) {
+            console.error("Error fetching menu data:", menuError || linkError);
+            return [];
+        }
+
+        // 3. 데이터 가공
+        const parentMenus = menus?.filter(menu => menu.id === menu.parent_id) || [];
+        const childMenus = menus?.filter(menu => menu.id !== menu.parent_id) || [];
+
+        // 메뉴별 프로그램 매핑
+        const menuProgramMap = new Map();
+        menuPrograms?.forEach(item => {
+            if (!menuProgramMap.has(item.menu_idx)) {
+                menuProgramMap.set(item.menu_idx, []);
+            }
+            menuProgramMap.get(item.menu_idx).push(item.programs);
+        });
+
+        // 최종 구조 생성
+        return parentMenus.map(parentMenu => {
+            const children = childMenus
+                .filter(child => child.parent_id === parentMenu.id)
+                .map(childMenu => {
+                    const programs = menuProgramMap.get(childMenu.id) || [];
+                    return {
+                        id: childMenu.name.toLowerCase().replace(/\s+/g, ''),
+                        title: childMenu.name,
+                        children: programs.map((program: Program) => ({
+                            id: program.path,
+                            title: program.name,
+                            programId: program.id
+                        }))
+                    };
+                });
+
+            return {
+                id: parentMenu.name.toLowerCase().replace(/\s+/g, ''),
+                title: parentMenu.name,
+                children
+            };
+        });
+    };
+
+
 }

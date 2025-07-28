@@ -1,9 +1,9 @@
 "use client"
 
-export default function DashboardMain() {
+export const DashBoardMain = () => {
     return (
         <div>
-            대시보드 입니다.
+            Main 대시보드 입니다.
         </div>
     )
 }

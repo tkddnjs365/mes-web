@@ -52,6 +52,8 @@ export function getAuthToken(): AuthToken | null {
 // 로컬 인증 토큰 삭제
 export function removeAuthToken(): void {
     localStorage.removeItem(AUTH_TOKEN_KEY) // 로컬스토리지에서 제거
+    localStorage.removeItem("mes-open-tabs")
+    localStorage.removeItem("mes-active-tab")
 }
 
 // 토큰이 유효한지 확인

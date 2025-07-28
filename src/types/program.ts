@@ -51,4 +51,9 @@ export interface ProgramWithDetails {
   id: string
   programId: number
 }
-
+export interface MenuItem {
+    id: string
+    title: string
+    children?: MenuItem[]
+    programId?: number
+}
