@@ -75,7 +75,7 @@ export class UserService {
     // 대기 중인 사용자 목록 조회 (O)
     static async getPendingUsers(company_idx?: string): Promise<PendingUser[]> {
         try {
-            if (!isSupabaseConfigured || !supabase) {
+            if (!isSupabaseConfigured || !supabase || !company_idx) {
                 return []
             }
 
