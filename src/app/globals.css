@@ -7,3 +7,11 @@ body {
 .bg-black-30 {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.ag-header-cell-label {
+    justify-content: center !important;
+}
+
+.ag-text-center-cell {
+  text-align: center;
+}

@@ -4,6 +4,9 @@ import {useAppContext} from "@/contexts/app-context"
 import Login from "@/components/login"
 import SuperuserDashboard from "@/components/superuser-dashboard";
 import Dashboard from "@/components/dashboard";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function Page() {
     const {currentUser, currentSuperUser, logout, isLoading} = useAppContext()

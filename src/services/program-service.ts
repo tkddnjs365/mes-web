@@ -6,6 +6,7 @@ import {DashBoardMain} from "@/components/dashboard-main"
 /* 프로그램 연결 */
 const componentMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
     "user-mng": () => import("@/components/pages/user-mng"),
+    "item-mng": () => import("@/components/pages/item-mng"),
 };
 
 export class ProgramService {
