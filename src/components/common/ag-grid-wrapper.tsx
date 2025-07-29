@@ -8,9 +8,11 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 interface AgGridWrapperProps<T> {
     rowData: T[];
     columnDefs: ColDef[];
+    height: string;
+    width: string;
 }
 
-export default function AgGridWrapper<T>({rowData, columnDefs}: AgGridWrapperProps<T>) {
+export default function AgGridWrapper<T>({rowData, columnDefs, height, width}: AgGridWrapperProps<T>) {
     // 순번 컬럼 정의
     const indexColumn: ColDef = {
         headerName: "No",
@@ -30,7 +32,7 @@ export default function AgGridWrapper<T>({rowData, columnDefs}: AgGridWrapperPro
     const finalColumnDefs: ColDef[] = [indexColumn, ...columnDefs];
 
     return (
-        <div className="ag-theme-alpine" style={{height: 600, width: "100%"}}>
+        <div className="ag-theme-alpine" style={{height: height, width: width}}>
             <AgGridReact<T>
                 rowData={rowData}
                 columnDefs={finalColumnDefs}
