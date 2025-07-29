@@ -51,9 +51,16 @@ export interface ProgramWithDetails {
   id: string
   programId: number
 }
+
 export interface MenuItem {
     id: string
     title: string
     children?: MenuItem[]
     programId?: number
+}
+
+export interface Prog_Menu_Company{
+  prog_idx: string
+  prog_name : string
+  menu_name : string
 }

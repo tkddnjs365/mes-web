@@ -1,9 +1,9 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import type {CompanyProgram, MenuCategory, MenuItem, MenuLinkProgram, Program} from "@/types/program"
-import {mockCompanyPrograms, mockMenuCategories, mockMenuPrograms, mockPrograms} from "@/data/data";
+import type {CompanyProgram, MenuCategory, MenuItem, MenuLinkProgram, Program, Prog_Menu_Company} from "@/types/program"
 import {CompanyService} from "@/services/company-service";
 import {DashBoardMain} from "@/components/dashboard-main"
 
+/* 프로그램 연결 */
 const componentMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
     "user-mng": () => import("@/components/pages/user-mng"),
 };
@@ -14,7 +14,7 @@ export class ProgramService {
     static async getPrograms(): Promise<Program[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return mockPrograms
+                return []
             }
 
             const {data, error} = await supabase.from("programs").select("*").order("created_at", {ascending: false})
@@ -42,16 +42,7 @@ export class ProgramService {
     static async createProgram(programData: { name: string; path: string; description: string; }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const newProgram: Program = {
-                    id: Date.now().toString(),
-                    name: programData.name,
-                    description: programData.description,
-                    path: programData.path,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                }
-                mockPrograms.push(newProgram)
-                return true
+                return false
             }
 
             const {error} = await supabase.from("programs").insert({
@@ -103,15 +94,7 @@ export class ProgramService {
     ): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const programIndex = mockPrograms.findIndex((p) => p.id === programId)
-                if (programIndex === -1) return false
-
-                mockPrograms[programIndex] = {
-                    ...mockPrograms[programIndex],
-                    ...programData,
-                    updatedAt: new Date().toISOString(),
-                }
-                return true
+                return false
             }
 
             const {error} = await supabase
@@ -133,11 +116,7 @@ export class ProgramService {
     static async deleteProgram(programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const programIndex = mockPrograms.findIndex((p) => p.id === programId)
-                if (programIndex === -1) return false
-
-                mockPrograms.splice(programIndex, 1)
-                return true
+                return false
             }
 
             const {error} = await supabase.from("programs").delete().eq("id", programId)
@@ -152,7 +131,7 @@ export class ProgramService {
     static async getMenuCategories(): Promise<MenuCategory[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return mockMenuCategories
+                return []
             }
 
             const {data, error} = await supabase
@@ -189,21 +168,7 @@ export class ProgramService {
     }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const parentId = categoryData.saveType === "main"
-                    ? Date.now().toString()
-                    : categoryData.parentId;
-
-                const newCategory: MenuCategory = {
-                    id: Date.now().toString(),
-                    name: categoryData.name,
-                    description: categoryData.description,
-                    sortOrder: categoryData.sortOrder,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    parentId: parentId,
-                }
-                mockMenuCategories.push(newCategory)
-                return true
+                return false
             }
 
             if (categoryData.saveType === "main") {
@@ -250,7 +215,7 @@ export class ProgramService {
     static async getMenuLihkPrograms(menuId: string): Promise<MenuLinkProgram[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return mockMenuPrograms.filter((cp) => cp.menuId === menuId)
+                return []
             }
 
             const {data, error} = await supabase
@@ -280,19 +245,7 @@ export class ProgramService {
     static async connectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const existing = mockMenuPrograms.find((cp) => cp.menuId === menuId && cp.programId === programId)
-                if (existing) return false
-
-                mockMenuPrograms.push({
-                    id: Date.now().toString(),
-                    menuId,
-                    programId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                })
-
-                console.log((mockMenuPrograms))
-                return true
+                return false
             }
 
             const {error} = await supabase.from("menu_link_prog").insert({
@@ -310,13 +263,7 @@ export class ProgramService {
     static async disconnectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const index = mockMenuPrograms.findIndex(
-                    (cp) => cp.menuId === menuId && cp.programId === programId,
-                )
-                if (index === -1) return false
-
-                mockMenuPrograms.splice(index, 1)
-                return true
+                return false
             }
 
             const {error} = await supabase
@@ -335,7 +282,7 @@ export class ProgramService {
     static async getCompanyPrograms(companyCode: string): Promise<CompanyProgram[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return mockCompanyPrograms.filter((cp) => cp.companyCode === companyCode)
+                return []
             }
 
             const {data, error} = await supabase
@@ -362,17 +309,7 @@ export class ProgramService {
     static async connectCompanyProgram(companyCode: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const existing = mockCompanyPrograms.find((cp) => cp.companyCode === companyCode && cp.programId === programId)
-                if (existing) return false
-
-                mockCompanyPrograms.push({
-                    id: Date.now().toString(),
-                    companyCode,
-                    programId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                })
-                return true
+                return false
             }
 
             // 회사 정보 가져오기
@@ -399,13 +336,7 @@ export class ProgramService {
     static async disconnectCompanyProgram(companyCode: string, programId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                const index = mockCompanyPrograms.findIndex(
-                    (cp) => cp.companyCode === companyCode && cp.programId === programId,
-                )
-                if (index === -1) return false
-
-                mockCompanyPrograms.splice(index, 1)
-                return true
+                return false
             }
 
             // 회사 정보 가져오기
@@ -497,5 +428,28 @@ export class ProgramService {
         });
     };
 
+    // 회사별 프로그램 목록 (O)
+    static async getProgMenuComany(company_idx: string): Promise<Prog_Menu_Company[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return []
+            }
+
+            const {data, error} = await supabase
+                .from("v_prog_menu_company")
+                .select("*")
+                .eq("company_idx", company_idx)
+
+            if (error || !data) return []
+
+            return data.map((cp) => ({
+                prog_idx: cp.prog_idx,
+                prog_name: cp.prog_name,
+                menu_name: cp.menu_nm
+            }))
+        } catch {
+            return []
+        }
+    }
 
 }
