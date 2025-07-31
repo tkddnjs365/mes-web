@@ -6,7 +6,7 @@ import {useAppContext} from "@/contexts/app-context";
 export default function Login() {
     const {login, loginSuperUser, addPendingUser} = useAppContext()
 
-    const [companyCode, setCompanyCode] = useState("") //회사코드
+    const [companyCode, setCompanyCode] = useState("1000") //회사코드
     const [userId, setUserId] = useState("") //로그인ID
     const [password, setPassword] = useState("") //로그인PW
     const [isLoading, setIsLoading] = useState(false)
@@ -14,7 +14,7 @@ export default function Login() {
 
     // 회원가입용 데이터
     const [signupData, setSignupData] = useState({
-        companyCode: "",
+        companyCode: "1000",
         userId: "",
         password: "",
         name: "",
@@ -25,8 +25,8 @@ export default function Login() {
         setIsLoading(true)
 
         try {
-            // 슈퍼유저 로그인 체크 (회사코드가 super인 경우)
-            if (companyCode == "super") {
+            // 슈퍼유저 로그인 체크
+            if (userId == "super00") {
                 const success = await loginSuperUser(userId, password)
                 if (!success) {
                     alert("슈퍼관리자 로그인 정보가 올바르지 않습니다.")
@@ -73,7 +73,7 @@ export default function Login() {
                 </div>
                 <div className="p-4">
                     <form onSubmit={handleLogin} className={"space-y-4"}>
-                        <div className={"space-y-2"}>
+                        <div className={"space-y-2 hidden"}>
                             <label htmlFor={"companyCode"}
                                    className={"block text-sm font-medium text-gray-700"}>회사코드</label>
                             <input
@@ -83,7 +83,7 @@ export default function Login() {
                                 value={companyCode}
                                 onChange={(e) => setCompanyCode(e.target.value)}
                                 className={"w-full px-3 py2- border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[44px]"}
-                                required={true}
+                                //required={true}
                                 disabled={isLoading}
                             />
                         </div>
@@ -132,7 +132,7 @@ export default function Login() {
 
                     <div className="mt-4 text-center text-sm text-gray-600">
                         <p>테스트 계정:</p>
-                        <p>회사코드 : 1000, ID : admin, PW : admin</p>
+                        <p>ID : admin, PW : admin</p>
                     </div>
                 </div>
             </div>
@@ -148,8 +148,9 @@ export default function Login() {
                         </div>
                         <div className={"p-4"}>
                             <form onSubmit={handleSignup} className={"space-y-4"}>
-                                <div className={"space-y-2"}>
-                                    <label htmlFor="signup-companyCode" className="block text-sm font-medium text-gray-700">
+                                <div className={"space-y-2 hidden"}>
+                                    <label htmlFor="signup-companyCode"
+                                           className="block text-sm font-medium text-gray-700">
                                         회사코드
                                     </label>
                                     <input
@@ -159,7 +160,7 @@ export default function Login() {
                                         value={signupData.companyCode}
                                         onChange={(e) => setSignupData({...signupData, companyCode: e.target.value})}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        required
+                                        //required
                                         disabled={isLoading}
                                     />
                                 </div>
@@ -222,7 +223,9 @@ export default function Login() {
                                     >
                                         취소
                                     </button>
-                                    <button type="submit" className="flex-1 px-4 py-4 min-h-[44px] rounded-md font-medium transition-all cursor-pointer border flex items-center justify-center bg-blue-600 text-white border-blue-600 hover:bg-blue-700" disabled={isLoading}>
+                                    <button type="submit"
+                                            className="flex-1 px-4 py-4 min-h-[44px] rounded-md font-medium transition-all cursor-pointer border flex items-center justify-center bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                                            disabled={isLoading}>
                                         {isLoading ? "요청 중..." : "가입요청"}
                                     </button>
                                 </div>

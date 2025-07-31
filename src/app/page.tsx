@@ -4,7 +4,7 @@ import {useAppContext} from "@/contexts/app-context"
 import Login from "@/components/login"
 import SuperuserDashboard from "@/components/superuser-dashboard";
 import Dashboard from "@/components/dashboard";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import {AllCommunityModule, ModuleRegistry} from "ag-grid-community";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 

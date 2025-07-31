@@ -6,3 +6,29 @@ npm install @supabase/supabase-js
 
 # 개발 도구
 npm install -D @types/node
+
+
+## Docker ##
+# 윈도우 서버에 Docker 설치 (재부팅 하라고 뜨면 재부팅)
+- PowerShell 관리자실행
+- Install-WindowsFeature -Name Containers
+- Enable-WindowsOptionalFeature -Online -FeatureName containers -All
+- Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
+- Invoke-WebRequest "https://github.com/docker/compose/releases/latest/download/docker-compose-darwin-x86_64" -UseBasicParsing -OutFile $env:SystemDirectory\docker-compose.exe
+- 재부팅
+- docker --version 으로 확인
+
+# 윈도우 서버용 Docker GUI (portainer) [포트 6990, 도커컨테이너 포트 : 9000]
+- docker volume create portainer_data
+- docker run -d -p 6990:9000 --name portainer --restart=always `
+  -v portainer_data:C:\data `
+  -v \\.\pipe\docker_engine:\\.\pipe\docker_engine `
+  portainer/portainer-ce
+- docker ps로 설치 확인
+# docker 서버 : http://175.119.156.135:6990/#!/init/admin
+# UserName : mes_admin
+# PW : mes_admin00!9
+
+# MariaDb
+# User : root
+# PW : mes_admin00!

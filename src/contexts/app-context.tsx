@@ -79,12 +79,22 @@ export function AppProvider({children}: { children: ReactNode }) {
     const loginSuperUser = async (userId: string, password: string): Promise<boolean> => {
         try {
             setIsLoading(true)
-            const superUser = await SuperUserService.loginSuperUser(userId, password)
+            if (userId === "super00") {
+                const superUser = await SuperUserService.loginSuperUser(userId, password)
 
-            if (superUser) {
-                setCurrentSuperUser(superUser)
-                saveAuthToken(superUser as User) // SuperUser를 User 타입으로 캐스팅
-                return true
+                if (superUser) {
+                    setCurrentSuperUser(superUser)
+                    saveAuthToken(superUser as User) // SuperUser를 User 타입으로 캐스팅
+                    return true
+                }
+            } else if (userId === "super00_mar") {
+                const superUser = await SuperUserService.loginSuperUser(userId, password)
+
+                if (superUser) {
+                    setCurrentSuperUser(superUser)
+                    saveAuthToken(superUser as User) // SuperUser를 User 타입으로 캐스팅
+                    return true
+                }
             }
             return false
         } catch (error) {
@@ -110,7 +120,7 @@ export function AppProvider({children}: { children: ReactNode }) {
         name: string
     }): Promise<boolean> => {
         try {
-             return await UserService.requestSignup(signupData)
+            return await UserService.requestSignup(signupData)
         } catch (error) {
             console.error("회원가입 요청 오류:", error)
             return false

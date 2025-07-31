@@ -6,6 +6,7 @@ import {UserService} from "@/services/user-service"
 import type {PendingUser, User} from "@/types/user"
 import {ProgramService} from "@/services/program-service";
 import {Prog_Menu_Company} from "@/types/program";
+import {LoadingSpinner} from "@/components/loading-spiner";
 
 export default function UserMng() {
     const {currentUser, currentSuperUser} = useAppContext()
@@ -146,12 +147,6 @@ export default function UserMng() {
 
     return (
         <div className="p-6 space-y-6">
-            {/* 헤더 */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">사용자 관리</h1>
-                <p className="text-gray-600 mt-1">사용자 승인 및 권한 관리</p>
-            </div>
-
             {/* 탭 */}
             <div className="border-b border-gray-200">
                 <nav className="mb-px flex space-x-8">
@@ -179,11 +174,7 @@ export default function UserMng() {
             </div>
 
             {/* 로딩 상태 */}
-            {isLoading && (
-                <div className="text-center py-8">
-                    <div className="text-gray-500">데이터를 불러오는 중...</div>
-                </div>
-            )}
+            {isLoading && <LoadingSpinner/>}
 
             {/* 승인 대기 탭 */}
             {activeTab === "pending" && !isLoading && (

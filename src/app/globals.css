@@ -15,3 +15,8 @@ body {
 .ag-text-center-cell {
   text-align: center;
 }
+
+/* 툴바 버튼 */
+.toolbar-btn {
+    @apply px-1 py-1.5 rounded-md flex items-center transition-all text-sm font-medium shadow-sm w-20 text-center justify-center;
+}
