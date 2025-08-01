@@ -202,7 +202,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
 
             {/* 모바일 사이드바 */}
             <div
-                className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg -translate-x-full transition-transform duration-300 ease-in-out z-50 ${isSidebarOpen ? "open" : "closed"} lg:hidden`}>
+                className={`fixed left-0 top-0 h-full w-64 bg-white shadow-md z-50 transform transition-transform duration-300 lg:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <DashboardSidebar
                     user={user}
                     onMenuClick={(prog_path, title) => {
@@ -223,11 +223,11 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                             {/* 햄버거 메뉴 (모바일) */}
                             <button
                                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                className={`flex flex-col justify-center items-center w-6 h-6 cursor-pointer lg:hidden ${isSidebarOpen ? "open" : ""}`}
+                                className="lg:hidden w-6 h-6"
                             >
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                                <span className="block w-4 h-0.5 bg-gray-800 mb-1"></span>
+                                <span className="block w-4 h-0.5 bg-gray-800 mb-1"></span>
+                                <span className="block w-4 h-0.5 bg-gray-800"></span>
                             </button>
 
                             {/* 로고 및 시스템 정보 */}
