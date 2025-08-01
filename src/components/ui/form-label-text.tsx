@@ -21,12 +21,19 @@ export const FormLabelText: React.FC<LabelTextProps> = ({
                                                             type = "text",
                                                             isError = false,
                                                         }) => {
-    const errorClass = isError ? "border-red-500" : "border-gray-300";
+    const errorClass = isError
+        ? "border-red-600 bg-red-50 focus:ring-red-500 focus:border-red-600"
+        : "border-gray-400 bg-white focus:ring-blue-600 focus:border-blue-600";
+
+    const disabledClass = disabled
+        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+        : "bg-white text-gray-900";
 
     return (
-        <div className={`flex items-start space-x-2`}>
-            <label className="text-sm font-medium text-gray-700 min-w-[60px] text-center pt-1">
+        <div className={`flex items-center space-x-2 text-center`}>
+            <label className="text-sm font-medium text-gray-700 min-w-[70px] text-right">
                 {label}
+                {isError && <span className="text-red-600 ml-1">*</span>}
             </label>
 
             {type === "text" ? (
@@ -34,7 +41,24 @@ export const FormLabelText: React.FC<LabelTextProps> = ({
                     type="text"
                     value={value}
                     onChange={(e) => onChange(e.currentTarget.value)}
-                    className={`bg-white min-h-[30px] ${inputWidth} border ${errorClass} rounded-md px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    className={`${inputWidth || "flex-1"}
+                                 min-h-[30px] 
+                                 border-2
+                                 ${errorClass}
+                                 ${disabledClass}
+                                 rounded-md 
+                                 px-3 
+                                 py-1.5 
+                                 text-sm 
+                                 font-medium
+                                 shadow-sm 
+                                 transition-all 
+                                 duration-200
+                                 focus:outline-none 
+                                 focus:ring-2 
+                                 focus:ring-offset-1
+                                 hover:border-gray-500
+                                `}
                     placeholder={placeholder}
                     disabled={disabled}
                     required
@@ -43,7 +67,27 @@ export const FormLabelText: React.FC<LabelTextProps> = ({
                 <textarea
                     value={value}
                     onChange={(e) => onChange(e.currentTarget.value)}
-                    className={`bg-white h-[100px] ${inputWidth} border ${errorClass} rounded-md px-3 py-2 text-sm shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    className={`${inputWidth || "flex-1"}
+                                min-h-[100px] 
+                                border-2
+                                bg-white 
+                                ${errorClass}
+                                ${disabledClass}
+                                rounded-md 
+                                px-3 
+                                py-1.5 
+                                text-sm 
+                                font-medium
+                                shadow-sm 
+                                resize-none
+                                transition-all 
+                                duration-200
+                                focus:outline-none 
+                                focus:ring-2 
+                                focus:ring-offset-1
+                                hover:border-gray-500
+                                leading-5
+                                `}
                     placeholder={placeholder}
                     disabled={disabled}
                 />

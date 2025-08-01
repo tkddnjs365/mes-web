@@ -115,15 +115,34 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
     const renderMenuItem = (item: MenuItem, level = 0) => {
         const hasChildren = item.children && item.children.length > 0 //하위 노드 여부
         const isExpanded = expandedMenus.includes(item.id)
-        const paddingLeft = `${(level + 1)}rem`
+
+        // MES 스타일 레벨별 들여쓰기 및 색상
+        const levelStyles = {
+            0: "bg-gradient-to-r from-blue-500 to-blue-800 text-white border-b border-blue-800",
+            1: "bg-gradient-to-r from-slate-100 to-slate-200 text-slate-800 border-b border-slate-300 ml-3",
+            2: "bg-white text-slate-700 border-b border-slate-200 ml-6",
+        }
+
+        const hoverStyles = {
+            0: "hover:from-blue-700 hover:to-blue-800",
+            1: "hover:from-slate-200 hover:to-slate-300 hover:shadow-sm",
+            2: "hover:bg-blue-50 hover:text-blue-800",
+        }
+
+        const currentLevelStyle = levelStyles[level as keyof typeof levelStyles] || levelStyles[2]
+        const currentHoverStyle = hoverStyles[level as keyof typeof hoverStyles] || hoverStyles[2]
 
         return (
-            <div key={item.id}>
+            <div key={item.id} className="transition-all duration-200">
                 <div
-                    className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 transition-colors ${
-                        level > 0 ? "border-l-2 border-gray-400 ml-4" : ""
-                    }`}
-                    style={{paddingLeft}}
+                    className={`
+                        flex items-center justify-between px-4 py-2 cursor-pointer 
+                        transition-all duration-200 ease-in-out
+                        ${currentLevelStyle} 
+                        ${currentHoverStyle}
+                        ${level === 0 ? 'font-bold text-sm shadow-md' : 'font-medium text-sm'}
+                        ${level > 0 ? 'border-l-4 border-blue-600' : ''}
+                    `}
                     onClick={() => {
                         if (hasChildren) {
                             toggleMenu(item.id)
@@ -132,18 +151,66 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
                         }
                     }}
                 >
-                    <div className="flex items-center space-x-2">
-                        <span className="text-gray-700 font-medium">{item.title}</span>
+                    <div className="flex items-center space-x-3">
+                        {/* 아이콘 추가 */}
+                        {level === 0 && (
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd"
+                                      d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                        )}
+                        {level === 1 && (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd"
+                                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                        )}
+                        {level >= 2 && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        )}
+
+                        <span className={"text-sm leading-tight"}>
+                            {item.title}
+                        </span>
                     </div>
 
                     {hasChildren && (
-                        /* 하위 노드가 있을때만 ▶ 표시 */
-                        <span className={`text-gray-400 transition-transform ${isExpanded ? "rotate-90" : ""}`}>▶</span>
+                        <div className="flex items-center space-x-2">
+                            {/* 하위 메뉴 개수 표시 */}
+                            <span className={`
+                                text-xs px-2 py-1 rounded-full 
+                                ${level === 0
+                                ? 'bg-blue-950 text-blue-100'
+                                : 'bg-slate-400 text-white'
+                            }
+                            `}>
+                                {item.children!.length}
+                            </span>
+
+                            {/* 토글 아이콘 */}
+                            <svg
+                                className={`
+                                    w-4 h-4 transition-transform duration-200 ease-in-out
+                                    ${isExpanded ? "rotate-90" : ""}
+                                    ${level === 0 ? 'text-blue-100' : 'text-slate-500'}
+                                `}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path fillRule="evenodd"
+                                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                        </div>
                     )}
                 </div>
 
                 {hasChildren && isExpanded && (
-                    <div className="bg-gray-50">{item.children!.map((child) => renderMenuItem(child, level + 1))}</div>
+                    <div className="transition-all duration-300 ease-in-out">
+                        {item.children!.map((child) => renderMenuItem(child, level + 1))}
+                    </div>
                 )}
             </div>
         )
@@ -152,7 +219,7 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
     const availableProgramsCount = user.role === "admin" ? companyPrograms.length : userPrograms.length
 
     return (
-        <div className="w-64 bg-white shadow-lg h-full flex flex-col">
+        <div className="w-64 bg-white shadow-2xl h-full flex flex-col border-r-1 border-blue-600">
             {/* 헤더 */}
             <div className="p-5 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
@@ -166,7 +233,7 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
             <div className="p-2 border-b border-gray-200 bg-gray-50">
                 {user.role !== "super" && (
                     <div className="mt-2 text-xs text-gray-600">
-                        {user.role === "admin" ? "회사 프로그램" : "연결된 프로그램"}:
+                        {"연결된 프로그램"}:
                         <span
                             className="font-semibold text-blue-600 ml-1">{loading ? "..." : `${availableProgramsCount}개`}</span>
                     </div>
@@ -174,19 +241,30 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
             </div>
 
             {/* 메뉴 */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-slate-50">
                 {loading && user.role !== "super" ? (
-                    <div className="p-4 text-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-2 text-xs text-gray-500">메뉴 로딩 중...</p>
+                    <div className="p-6 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-sm text-slate-600 font-medium">메뉴 구성 중...</p>
+                        <p className="text-xs text-slate-500 mt-1">잠시만 기다려주세요</p>
                     </div>
                 ) : filteredMenus.length === 0 ? (
-                    <div className="p-4 text-center">
-                        <p className="text-sm text-gray-500">접근 가능한 메뉴가 없습니다.</p>
-                        <p className="text-xs text-gray-400 mt-1">관리자에게 문의하세요.</p>
+                    <div className="p-6 text-center">
+                        <div
+                            className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd"
+                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                        </div>
+                        <p className="text-sm text-slate-700 font-medium">접근 가능한 메뉴가 없습니다</p>
+                        <p className="text-xs text-slate-500 mt-2">관리자에게 권한을 요청하세요</p>
                     </div>
                 ) : (
-                    <div className="py-2">{filteredMenus.map((item) => renderMenuItem(item))}</div>
+                    <div className="py-2">
+                        {filteredMenus.map((item) => renderMenuItem(item))}
+                    </div>
                 )}
             </div>
 

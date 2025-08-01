@@ -47,12 +47,12 @@ export default function ItemMng() {
         {headerName: "품목코드", field: "item_cd", width: 150, cellClass: "ag-text-center-cell",},
         {headerName: "품목명", field: "item_nm", width: 300},
         {headerName: "품목규격", field: "item_spec", width: 300},
-        {headerName: "품목구분", field: "item_type", width: 90, cellClass: "ag-text-center-cell",},
-        {headerName: "품목단위", field: "item_unit", width: 90, cellClass: "ag-text-center-cell",},
+        {headerName: "품목구분", field: "item_type", width: 110, cellClass: "ag-text-center-cell",},
+        {headerName: "품목단위", field: "item_unit", width: 110, cellClass: "ag-text-center-cell",},
         {
             headerName: "사용여부",
             field: "item_yn",
-            width: 90,
+            width: 110,
             cellStyle: {display: "flex", justifyContent: "center", alignItems: "center"},
         },
         {headerName: "생성일시", field: "item_created_at", valueFormatter: (params) => formatToKoreanDate(params.value),}
@@ -190,7 +190,6 @@ export default function ItemMng() {
         ];
         const validation = validateRequiredFields(requiredFields);
         if (!validation.isValid) {
-            alert(validation.message);
             setInvalidFields(validation.invalidKeys); // 상태로 저장
             return;
         }
@@ -240,15 +239,15 @@ export default function ItemMng() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-2">
             {/* 조회조건 */}
             <div className="bg-white rounded-sm shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                     {/* 조회조건 */}
                     <div
-                        className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md flex-wrap border-r border-gray-300">
+                        className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
                         <label htmlFor="select_item"
-                               className="text-center text-sm font-medium text-gray-700 min-w-[60px]">
+                               className="text-center text-sm font-semibold text-gray-700 min-w-[60px]">
                             품목
                         </label>
                         <input
@@ -256,7 +255,7 @@ export default function ItemMng() {
                             type="text"
                             value={searchCondition.item}
                             onChange={(e) => setSearchCondition({...searchCondition, item: e.currentTarget.value})}
-                            className="bg-white min-h-[30px] w-[240px] border border-gray-300 rounded-md px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="bg-white min-h-[36px] w-[280px] border-2 border-gray-300 rounded-md px-3 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200"
                             placeholder="품목을 입력하세요"
                             required
                             disabled={isLoading}
@@ -284,7 +283,7 @@ export default function ItemMng() {
             </div>
 
             <div className={"flex justify-between space-x-2 w-full"}>
-                <div className={"w-[60%] h-[60vh]"}>
+                <div className={"w-[60%] h-[65vh]"}>
                     <AgGridWrapper<Item>
                         ref={gridRef}
                         rowData={rowData}
@@ -295,103 +294,171 @@ export default function ItemMng() {
                     />
                 </div>
 
-                <div className="bg-white rounded-sm shadow-sm border border-gray-200 w-[40%] overflow-x-auto px-4 h-80">
-                    <h1 className={"mt-2"}>품목 일반 정보</h1>
-                    <div className={"border-t border-gray-400 w-full mb-4 mt-2"}></div>
+                {/* 상세 정보 패널 */}
+                <div className="bg-white rounded-lg shadow-md border border-gray-200 w-[40%] h-80 min-h-[65vh] overflow-x-auto overflow-y-auto">
+                    {/* 패널 헤더 */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 border-b-2 border-blue-800">
+                        <div className="flex items-center justify-between">
+                            <div className="flex">
+                                {/* 왼쪽: 타이틀 */}
+                                <div className="flex items-center text-white font-bold text-sm">
+                                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                    <span>품목 상세 정보</span>
+                                </div>
 
-                    <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                        <FormLabelText
-                            label="품목코드"
-                            value={saveCondition.item_cd}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_cd: val});
-                                if (invalidFields.includes("item_cd") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_cd"));
-                                }
-                            }}
-                            placeholder=""
-                            disabled={isLoading}
-                            inputWidth="w-[150px]"
-                            isError={invalidFields.includes("item_cd")}
-                        />
-                        <FormLabelText
-                            label="품목명"
-                            value={saveCondition.item_nm}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_nm: val});
-                                if (invalidFields.includes("item_nm") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_nm"));
-                                }
-                            }}
-                            placeholder=""
-                            disabled={isLoading}
-                            inputWidth="w-[250px]"
-                            isError={invalidFields.includes("item_nm")}
-                        />
-                        <FormLabelSelect
-                            label="품목구분"
-                            value={saveCondition.item_type}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_type: val});
-                                if (invalidFields.includes("item_type") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_type"));
-                                }
-                            }}
-                            options={itemTypes}
-                            disabled={isLoading}
-                            isError={invalidFields.includes("item_type")}
-                        />
-                        <FormLabelText
-                            label="품목규격"
-                            value={saveCondition.item_spec}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_spec: val});
-                                if (invalidFields.includes("item_spec") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_spec"));
-                                }
-                            }}
-                            placeholder=""
-                            disabled={isLoading}
-                            inputWidth="w-[250px]"
-                            isError={invalidFields.includes("item_spec")}
-                        />
-                        <FormLabelSelect
-                            label="품목단위"
-                            value={saveCondition.item_unit}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_unit: val});
-                                if (invalidFields.includes("item_unit") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_unit"));
-                                }
-                            }}
-                            options={itemUnits}
-                            disabled={isLoading}
-                            isError={invalidFields.includes("item_unit")}
-                        />
-                        <FormLabelSelect
-                            label="사용여부"
-                            value={saveCondition.item_yn}
-                            onChange={(val) => {
-                                setSaveCondition({...saveCondition, item_yn: val});
-                                if (invalidFields.includes("item_yn") && val.trim() !== "") {
-                                    setInvalidFields(invalidFields.filter((key) => key !== "item_yn"));
-                                }
-                            }}
-                            options={USE_YN_OPTIONS}
-                            disabled={isLoading}
-                        />
+                                {/* 가운데: 상태 표시 */}
+                                <div className="ml-4 flex items-center space-x-2 text-xs text-white">
+                                    <div
+                                        className={`w-2 h-2 rounded-full ${selectItemIdx ? 'bg-red-500' : 'bg-white'}`}></div>
+                                    <span>{selectItemIdx ? '수정 등록' : '신규 등록'}</span>
+                                </div>
+                            </div>
+
+                            {/* 오른쪽: 필수 항목 경고 */}
+                            {invalidFields.length > 0 && (
+                                <div
+                                    className="flex items-center space-x-1 text-red-500 font-semibold text-xs bg-red-100 px-2 py-1 rounded">
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                    <span>필수 항목을 확인하세요</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className={"mt-4"}>
-                        <FormLabelText
-                            label="특기사항"
-                            value={saveCondition.etc}
-                            onChange={(val) => setSaveCondition({...saveCondition, etc: val})}
-                            placeholder=""
-                            disabled={isLoading}
-                            inputWidth="w-[600px]"
-                            type="textarea"
-                        />
+                    {/* 패널 내용 */}
+                    <div className="p-4 space-y-4">
+                        {/* 기본 정보 섹션 */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <h3 className="text-sm font-semibold text-gray-800">기본 정보</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                <FormLabelText
+                                    label="품목코드"
+                                    value={saveCondition.item_cd}
+                                    onChange={(val) => {
+                                        setSaveCondition({...saveCondition, item_cd: val});
+                                        if (invalidFields.includes("item_cd") && val.trim() !== "") {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "item_cd"));
+                                        }
+                                    }}
+                                    placeholder="품목코드를 입력하세요"
+                                    disabled={isLoading}
+                                    inputWidth="w-full"
+                                    isError={invalidFields.includes("item_cd")}
+                                />
+
+                                <FormLabelText
+                                    label="품목명"
+                                    value={saveCondition.item_nm}
+                                    onChange={(val) => {
+                                        setSaveCondition({...saveCondition, item_nm: val});
+                                        if (invalidFields.includes("item_nm") && val.trim() !== "") {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "item_nm"));
+                                        }
+                                    }}
+                                    placeholder="품목명을 입력하세요"
+                                    disabled={isLoading}
+                                    inputWidth="w-full"
+                                    isError={invalidFields.includes("item_nm")}
+                                />
+                            </div>
+                        </div>
+
+                        {/* 분류 정보 섹션 */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <h3 className="text-sm font-semibold text-gray-800">분류 정보</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                                <FormLabelSelect
+                                    label="품목구분"
+                                    value={saveCondition.item_type}
+                                    onChange={(val) => {
+                                        setSaveCondition({...saveCondition, item_type: val});
+                                        if (invalidFields.includes("item_type") && val.trim() !== "") {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "item_type"));
+                                        }
+                                    }}
+                                    options={itemTypes}
+                                    disabled={isLoading}
+                                    isError={invalidFields.includes("item_type")}
+                                />
+
+                                <FormLabelSelect
+                                    label="품목단위"
+                                    value={saveCondition.item_unit}
+                                    onChange={(val) => {
+                                        setSaveCondition({...saveCondition, item_unit: val});
+                                        if (invalidFields.includes("item_unit") && val.trim() !== "") {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "item_unit"));
+                                        }
+                                    }}
+                                    options={itemUnits}
+                                    disabled={isLoading}
+                                    isError={invalidFields.includes("item_unit")}
+                                />
+
+                                <FormLabelSelect
+                                    label="사용여부"
+                                    value={saveCondition.item_yn}
+                                    onChange={(val) => {
+                                        setSaveCondition({...saveCondition, item_yn: val});
+                                    }}
+                                    options={USE_YN_OPTIONS}
+                                    disabled={isLoading}
+                                />
+                            </div>
+                        </div>
+
+                        {/* 상세 정보 섹션 */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                <h3 className="text-sm font-semibold text-gray-800">상세 정보</h3>
+                            </div>
+
+                            <FormLabelText
+                                label="품목규격"
+                                value={saveCondition.item_spec}
+                                onChange={(val) => {
+                                    setSaveCondition({...saveCondition, item_spec: val});
+                                    if (invalidFields.includes("item_spec") && val.trim() !== "") {
+                                        setInvalidFields(invalidFields.filter((key) => key !== "item_spec"));
+                                    }
+                                }}
+                                placeholder="품목규격을 입력하세요"
+                                disabled={isLoading}
+                                inputWidth="w-full"
+                                isError={invalidFields.includes("item_spec")}
+                            />
+
+                            <FormLabelText
+                                label="특기사항"
+                                value={saveCondition.etc}
+                                onChange={(val) => setSaveCondition({...saveCondition, etc: val})}
+                                placeholder="특기사항을 입력하세요"
+                                disabled={isLoading}
+                                inputWidth="w-full"
+                                type="textarea"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
