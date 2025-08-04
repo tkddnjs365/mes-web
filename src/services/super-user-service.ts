@@ -27,7 +27,6 @@ export class SuperUserService {
             return {
                 id: data.id,
                 user_id: data.user_id,
-                password: data.password,
                 name: data.name,
                 permissions: data.permissions || [],
                 role: data.role,
