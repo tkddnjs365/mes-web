@@ -15,7 +15,6 @@ export interface User {
 export interface SuperUser {
   id: string
   user_id: string
-  password: string
   name: string
   permissions: string[]
   role: "super"
