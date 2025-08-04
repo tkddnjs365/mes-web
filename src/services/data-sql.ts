@@ -67,7 +67,7 @@ export class DataSql {
     }
 
     /* 품목 전체 조회 */
-    static async get_item_list(company_idx: string, item: string, item_idx?: string): Promise<Item[]> {
+    static async get_item_list(company_idx: string, item: string, item_idx?: string, item_type?: string, item_yn?: string): Promise<Item[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return []
@@ -82,6 +82,12 @@ export class DataSql {
             }
             if (item_idx) {
                 query = query.eq("item_idx", item_idx);
+            }
+            if (item_type) {
+                query = query.eq("item_type_idx", item_type);
+            }
+            if (item_yn) {
+                query = query.eq("item_yn", item_yn);
             }
             query = query.order("item_created_at", {ascending: false});
 

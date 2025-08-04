@@ -1,6 +1,10 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {Company_Admin, SuperUser} from "@/types/user"
 import {CompanyService} from "@/services/company-service";
+import bcrypt from "bcryptjs";
+
+// 비밀번호 해싱
+const saltRounds = 10;
 
 export class SuperUserService {
 
@@ -38,7 +42,7 @@ export class SuperUserService {
     static async createCompany(companyData: { code: string; name: string; description: string }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return  false
+                return false
             }
 
             const {error} = await supabase.from("companies").insert({
@@ -63,7 +67,7 @@ export class SuperUserService {
     }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return  false
+                return false
             }
 
             // 회사 정보 가져오기
@@ -74,11 +78,12 @@ export class SuperUserService {
             }
 
             const company_idx = comp_data[0].id;
+            const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
 
             // users 테이블에도 추가 (로그인을 위해)
             const {error: userError} = await supabase.from("users").insert({
                 user_id: adminData.userId,
-                password: adminData.password,
+                password: hashedPassword,
                 name: adminData.name,
                 role: "admin",
                 permissions: JSON.stringify(["all"]),
@@ -134,7 +139,7 @@ export class SuperUserService {
     static async deleteCompanyAdmin(adminId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
-                return  false
+                return false
             }
 
             // 먼저 관리자 정보 조회

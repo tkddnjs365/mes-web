@@ -241,49 +241,61 @@ export default function ItemMng() {
     return (
         <div className="p-6 space-y-2">
             {/* 조회조건 */}
-            <div className="bg-white rounded-sm shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between">
-                    {/* 조회조건 */}
-                    <div
-                        className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-                        <label htmlFor="select_item"
-                               className="text-center text-sm font-semibold text-gray-700 min-w-[60px]">
-                            품목
-                        </label>
-                        <input
-                            id="select_item"
-                            type="text"
-                            value={searchCondition.item}
-                            onChange={(e) => setSearchCondition({...searchCondition, item: e.currentTarget.value})}
-                            className="bg-white min-h-[36px] w-[280px] border-2 border-gray-300 rounded-md px-3 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200"
-                            placeholder="품목을 입력하세요"
-                            required
-                            disabled={isLoading}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault(); // 폼 제출 같은 기본 동작 막기
-                                    handleSearch();
-                                }
-                            }}
-                        />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                {/* 헤더: 조회조건 타이틀 + 버튼 툴바 */}
+                <div
+                    className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                        <h3 className="text-base font-semibold text-gray-800">조회조건</h3>
                     </div>
 
-                    {/* 버튼 툴바 */}
+                    {/* 버튼 툴바 - 항상 우측 상단 고정 */}
                     <CommonToolbar
                         onReset={handleReset}
                         onSearch={handleSearch}
-                        onSave={handleSave}
                         onExport={handleExcel}
+                        onSave={handleSave}
                         visibleReset={true}
                         visibleSearch={true}
-                        visibleSave={true}
                         visibleExprot={true}
+                        visibleSave={true}
                     />
+                </div>
+
+                {/* 조회조건 필드들 */}
+                <div className="p-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        {/* 품목 - 개별 박스로 그룹핑 */}
+                        <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
+                            <label
+                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
+                                품목
+                            </label>
+                            <input
+                                type="text"
+                                value={searchCondition.item}
+                                onChange={(e) => setSearchCondition({
+                                    ...searchCondition,
+                                    item: e.currentTarget.value
+                                })}
+                                className="w-[280px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="품목명 또는 품목코드 입력"
+                                disabled={isLoading}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSearch();
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div className={"flex justify-between space-x-2 w-full"}>
-                <div className={"w-[60%] h-[65vh]"}>
+                <div className={"w-[60%] h-[60vh]"}>
                     <AgGridWrapper<Item>
                         ref={gridRef}
                         rowData={rowData}
@@ -295,7 +307,8 @@ export default function ItemMng() {
                 </div>
 
                 {/* 상세 정보 패널 */}
-                <div className="bg-white rounded-lg shadow-md border border-gray-200 w-[40%] h-80 min-h-[65vh] overflow-x-auto overflow-y-auto">
+                <div
+                    className="bg-white rounded-lg shadow-md border border-gray-200 w-[40%] h-80 min-h-[60vh] overflow-x-auto overflow-y-auto">
                     {/* 패널 헤더 */}
                     <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 border-b-2 border-blue-800">
                         <div className="flex items-center justify-between">

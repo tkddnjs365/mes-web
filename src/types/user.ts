@@ -3,7 +3,6 @@ export interface User {
   id: string
   company_idx: string
   user_id: string
-  password: string
   name: string
   role: "admin" | "user" | "super"
   permissions: string[]

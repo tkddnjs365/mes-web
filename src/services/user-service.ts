@@ -2,6 +2,10 @@ import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
 import {CompanyService} from "@/services/company-service";
+import bcrypt from "bcryptjs";
+
+// 비밀번호 해싱
+const saltRounds = 10;
 
 export class UserService {
     // 로그인 (O)
@@ -16,20 +20,26 @@ export class UserService {
                 .select("*")
                 .eq("company_code", companyCode)
                 .eq("user_id", userId)
-                .eq("password", password)
                 .maybeSingle();
 
+            if (error || !data) {
+                console.error("사용자 조회 실패:", error);
+                return null
+            } else {
+                // 암호화된 비밀번호 비교
+                const isMatch = await bcrypt.compare(password, data.password);
 
-            console.log("companyCode : ", companyCode, " user_id : ", userId, " password : ", password)
-            console.log("data : ", data)
-            console.log(error)
-
-            if (error || !data) return null
+                if (isMatch) {
+                    console.log("로그인 성공!");
+                } else {
+                    console.log("비밀번호 불일치");
+                    return null
+                }
+            }
 
             return {
                 id: data.user_idx,
                 user_id: data.user_id,
-                password: data.password,
                 name: data.name,
                 role: data.role,
                 company_idx: data.company_idx,
@@ -85,7 +95,6 @@ export class UserService {
                 console.error("회사 조회 실패:", comp_data);
                 return []
             }
-
 
             const {
                 data,
@@ -167,8 +176,6 @@ export class UserService {
                 console.error("회사 조회 실패:", comp_data);
                 return false;
             }
-            console.log(comp_data[0].id)
-            console.log(pendingUser.user_id)
 
             const {data: userSelect} = await supabase
                 .from("users")
@@ -180,10 +187,12 @@ export class UserService {
                 return false;
             }
 
+            const hashedPassword = await bcrypt.hash(pendingUser.password, saltRounds);
+
             // users 테이블에 추가
             const {error: userError} = await supabase.from("users").insert({
                 user_id: pendingUser.user_id,
-                password: pendingUser.password,
+                password: hashedPassword,
                 name: pendingUser.name,
                 role: "user",
                 permissions: [],

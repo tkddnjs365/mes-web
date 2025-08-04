@@ -7,6 +7,7 @@ import {DashBoardMain} from "@/components/dashboard-main"
 const componentMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
     "user-mng": () => import("@/components/pages/user-mng"),
     "item-mng": () => import("@/components/pages/item-mng"),
+    "item-mng-list": () => import("@/components/pages/item-mng-list"),
 };
 
 export class ProgramService {
