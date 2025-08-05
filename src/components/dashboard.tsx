@@ -304,7 +304,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                 </header>
 
                 {/* 메인 콘텐츠 */}
-                <main className={"flex-1 p-4 sm:p-6 overflow-hidden"}>
+                <main className={"flex-1 p-2.5 overflow-hidden"}>
                     <div className={"h-full flex flex-col"}>
                         <div className={"mb-4 flex border-b border-gray-200 overflow-x-auto pb-3"}>
                             {openTabs.map((tab) => (

@@ -239,7 +239,7 @@ export default function ItemMng() {
     }
 
     return (
-        <div className="p-6 space-y-2">
+        <div className="p-4 space-y-2">
             {/* 조회조건 */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 {/* 헤더: 조회조건 타이틀 + 버튼 툴바 */}
@@ -295,7 +295,7 @@ export default function ItemMng() {
             </div>
 
             <div className={"flex justify-between space-x-2 w-full"}>
-                <div className={"w-[60%] h-[60vh]"}>
+                <div className={"w-[60%] h-[65vh]"}>
                     <AgGridWrapper<Item>
                         ref={gridRef}
                         rowData={rowData}
@@ -308,7 +308,7 @@ export default function ItemMng() {
 
                 {/* 상세 정보 패널 */}
                 <div
-                    className="bg-white rounded-lg shadow-md border border-gray-200 w-[40%] h-80 min-h-[60vh] overflow-x-auto overflow-y-auto">
+                    className="bg-white rounded-lg shadow-md border border-gray-200 w-[40%] h-80 min-h-[65vh] overflow-x-auto overflow-y-auto">
                     {/* 패널 헤더 */}
                     <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 border-b-2 border-blue-800">
                         <div className="flex items-center justify-between">

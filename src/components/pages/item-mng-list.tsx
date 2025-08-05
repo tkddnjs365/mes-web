@@ -139,7 +139,7 @@ export default function ItemMngList() {
     }
 
     return (
-        <div className="p-6 space-y-2">
+        <div className="p-4 space-y-2">
             {/* 조회조건 */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 {/* 헤더: 조회조건 타이틀 + 버튼 툴바 */}
@@ -237,7 +237,7 @@ export default function ItemMngList() {
             </div>
 
             <div className={"flex justify-between space-x-2 w-full"}>
-                <div className={"w-[100%] h-[60vh]"}>
+                <div className={"w-[100%] h-[65vh]"}>
                     <AgGridWrapper<Item>
                         ref={gridRef}
                         rowData={rowData}
