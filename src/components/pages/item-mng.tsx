@@ -195,7 +195,6 @@ export default function ItemMng() {
         }
         setInvalidFields([]); // 오류 없으면 초기화
 
-
         const confirmSave = window.confirm("저장하시겠습니까?");
         if (!confirmSave) return;
 
@@ -255,11 +254,9 @@ export default function ItemMng() {
                         onReset={handleReset}
                         onSearch={handleSearch}
                         onExport={handleExcel}
-                        onSave={handleSave}
                         visibleReset={true}
                         visibleSearch={true}
                         visibleExprot={true}
-                        visibleSave={true}
                     />
                 </div>
 
@@ -351,7 +348,7 @@ export default function ItemMng() {
                     </div>
 
                     {/* 패널 내용 */}
-                    <div className="p-4 space-y-4">
+                    <div className="px-4 py-3 space-y-4">
                         {/* 기본 정보 섹션 */}
                         <div className="space-y-2">
                             <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
@@ -471,6 +468,24 @@ export default function ItemMng() {
                                 inputWidth="w-full"
                                 type="textarea"
                             />
+                        </div>
+
+                        {/* 하단 버튼 */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2 pb-1 border-b border-gray-200"/>
+
+                            <div className="flex justify-end">
+                                <CommonToolbar
+                                    onReset={() => {
+                                        setSaveCondition(INITIAL_SAVE_CONDITION);
+                                        setSelectItemIdx("");
+                                        setInvalidFields([]);
+                                    }}
+                                    onSave={handleSave}
+                                    visibleReset={true}
+                                    visibleSave={true}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
