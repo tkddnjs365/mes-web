@@ -18,10 +18,31 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
     const [loading, setLoading] = useState(true)
     const [filteredMenus, setFilteredMenus] = useState<MenuItem[]>([])
 
+    // 모든 메뉴 ID를 재귀적으로 수집하는 함수
+    const getAllMenuIds = (menus: MenuItem[]): string[] => {
+        const ids: string[] = []
+
+        const collectIds = (items: MenuItem[]) => {
+            items.forEach(item => {
+                if (item.children && item.children.length > 0) {
+                    ids.push(item.id)
+                    collectIds(item.children)
+                }
+            })
+        }
+
+        collectIds(menus)
+        return ids
+    }
+
     useEffect(() => {
         const loadMenus = async () => {
             const menus = await getFilteredMenuItems()
             setFilteredMenus(menus)
+
+            // 모든 메뉴를 확장 상태로 설정
+            const allMenuIds = getAllMenuIds(menus)
+            setExpandedMenus(allMenuIds)
         }
 
         loadMenus()
