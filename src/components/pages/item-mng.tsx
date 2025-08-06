@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from "react";
 import {ColDef} from "ag-grid-community";
 import {formatToKoreanDate} from "@/utils/data-format";
 import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapper";
-import {DataSql} from "@/services/supabase-data-sql";
+import {SupabaseDataSql} from "@/services/supabase-data-sql";
 import {CommonCode, Item, ItemInsertData} from "@/types/data-sql";
 import {useAppContext} from "@/contexts/app-context";
 import {CommonToolbar} from "@/components/common/common-toolbar";
@@ -73,11 +73,11 @@ export default function ItemMng() {
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
+            const itemTypeData = await SupabaseDataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
 
             // 품목단위 로드
-            const itemUnitData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_unit');
+            const itemUnitData = await SupabaseDataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_unit');
             setItemUnits([{label: "", value: ""}, ...itemUnitData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
@@ -92,7 +92,7 @@ export default function ItemMng() {
             if (!currentUser) {
                 setRowData([])
             } else {
-                const data = await DataSql.get_item_list(currentUser.company_idx, searchCondition.item)
+                const data = await SupabaseDataSql.get_item_list(currentUser.company_idx, searchCondition.item)
                 console.log("품목 데이터 : ", data)
                 setRowData(data)
             }
@@ -122,7 +122,7 @@ export default function ItemMng() {
                 return;
             }
 
-            const data = await DataSql.get_item_list(currentUser.company_idx, "", item_idx)
+            const data = await SupabaseDataSql.get_item_list(currentUser.company_idx, "", item_idx)
             console.log("선택된 품목 상세 데이터 : ", data)
 
             // 조회된 데이터가 있으면 saveCondition에 설정
@@ -214,7 +214,7 @@ export default function ItemMng() {
             etc: saveCondition.etc,
         };
 
-        const result = await DataSql.set_item_list(selectItemIdx, [itemData]);
+        const result = await SupabaseDataSql.set_item_list(selectItemIdx, [itemData]);
         if (result.success) {
             alert("저장되었습니다.");
             console.log('저장 성공, item_idx:', result.item_idx);

@@ -4,7 +4,7 @@ import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapp
 import {CommonCode, Item} from "@/types/data-sql";
 import {useEffect, useRef, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
-import {DataSql} from "@/services/supabase-data-sql";
+import {SupabaseDataSql} from "@/services/supabase-data-sql";
 import {ColDef, ICellRendererParams} from "ag-grid-community";
 import {formatToKoreanDate} from "@/utils/data-format";
 import {CommonToolbar} from "@/components/common/common-toolbar";
@@ -78,7 +78,7 @@ export default function ItemMngList() {
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
+            const itemTypeData = await SupabaseDataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
@@ -93,7 +93,7 @@ export default function ItemMngList() {
             if (!currentUser) {
                 setRowData([])
             } else {
-                const data = await DataSql.get_item_list(currentUser.company_idx, searchCondition.item, "", searchCondition.item_type, searchCondition.item_yn)
+                const data = await SupabaseDataSql.get_item_list(currentUser.company_idx, searchCondition.item, "", searchCondition.item_type, searchCondition.item_yn)
                 console.log("품목 데이터 : ", data)
                 setRowData(data)
             }
