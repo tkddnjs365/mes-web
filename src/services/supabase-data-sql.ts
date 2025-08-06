@@ -1,7 +1,7 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {CommonCode, Item, ItemInsertData} from "@/types/data-sql";
 
-export class DataSql {
+export class SupabaseDataSql {
 
     /* 공통데이터 조회 */
     static async get_comm_code(company_idx: string, group_id: string): Promise<CommonCode[]> {

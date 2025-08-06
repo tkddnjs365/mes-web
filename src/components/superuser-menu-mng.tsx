@@ -1,7 +1,7 @@
 "use client"
 
 import {useEffect, useState} from "react"
-import {ProgramService} from "@/services/program-service"
+import {SupabaseProgramService} from "@/services/supabase-program-service"
 import type {MenuCategory, MenuLinkProgram, Program} from "@/types/program"
 
 export default function SuperuserMenuMng() {
@@ -35,8 +35,8 @@ export default function SuperuserMenuMng() {
         setIsLoading(true)
         try {
             const [programsData, categoriesData] = await Promise.all([
-                ProgramService.getPrograms(),
-                ProgramService.getMenuCategories(),
+                SupabaseProgramService.getPrograms(),
+                SupabaseProgramService.getMenuCategories(),
             ])
 
             setPrograms(programsData)
@@ -59,7 +59,7 @@ export default function SuperuserMenuMng() {
 
         setIsLoading(true)
         try {
-            const success = await ProgramService.createMenuCategory(categoryFormData)
+            const success = await SupabaseProgramService.createMenuCategory(categoryFormData)
             if (success) {
                 alert("메뉴가 등록되었습니다.")
                 setIsCategoryDialogOpen(false)
@@ -98,7 +98,7 @@ export default function SuperuserMenuMng() {
     /* 선택된 중메뉴의 프로그램 조회 */
     const loadMenuLinkPrograms = async (menuId: string) => {
         try {
-            const data = await ProgramService.getMenuLihkPrograms(menuId)
+            const data = await SupabaseProgramService.getMenuLihkPrograms(menuId)
             setMenuLinkPrograms(data)
         } catch (error) {
             console.error("회사 프로그램 목록 로드 실패:", error)
@@ -118,8 +118,8 @@ export default function SuperuserMenuMng() {
 
         try {
             const success = isConnected
-                ? await ProgramService.disconnectMenuProgram(selectedSubCategory.id, programId)
-                : await ProgramService.connectMenuProgram(selectedSubCategory.id, programId)
+                ? await SupabaseProgramService.disconnectMenuProgram(selectedSubCategory.id, programId)
+                : await SupabaseProgramService.connectMenuProgram(selectedSubCategory.id, programId)
 
             if (success) {
                 await loadMenuLinkPrograms(selectedSubCategory.id)

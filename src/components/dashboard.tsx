@@ -4,7 +4,7 @@ import {User} from "@/types/user";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import {useEffect, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
-import {ProgramService} from "@/services/program-service";
+import {SupabaseProgramService} from "@/services/supabase-program-service";
 import {DashBoardMain} from "@/components/dashboard-main"
 
 interface DashboardProps {
@@ -49,7 +49,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
 
                     /* 각 탭 데이터를 동적으로 로딩*/
                     for (const tabData of parsedTabs) {
-                        const component = await ProgramService.getProgram_progIdx(tabData.id);
+                        const component = await SupabaseProgramService.getProgram_progIdx(tabData.id);
                         if (component !== null)
                             restoredTabs.push({
                                 ...tabData,
@@ -188,7 +188,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                     user={user}
                     onMenuClick={(prog_path, title) => {
                         (async () => {
-                            const Component = await ProgramService.getProgram_progIdx(prog_path);
+                            const Component = await SupabaseProgramService.getProgram_progIdx(prog_path);
                             if (Component !== null)
                                 openTab(prog_path, title, Component);
                         })();
@@ -207,7 +207,7 @@ export default function Dashboard({user, onLogout}: DashboardProps) {
                     user={user}
                     onMenuClick={(prog_path, title) => {
                         (async () => {
-                            const Component = await ProgramService.getProgram_progIdx(prog_path);
+                            const Component = await SupabaseProgramService.getProgram_progIdx(prog_path);
                             if (Component !== null)
                                 openTab(prog_path, title, Component);
                         })();

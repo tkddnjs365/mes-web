@@ -1,7 +1,7 @@
 import {Company} from "@/types/user";
 import {isSupabaseConfigured, supabase} from "@/lib/supabase";
 
-export class CompanyService {
+export class SupabaseCompanyService {
     // 회사 목록 조회 (O)
     static async getCompanies(): Promise<Company[]> {
         try {

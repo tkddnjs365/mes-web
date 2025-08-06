@@ -1,11 +1,11 @@
 "use client"
 
 import {useEffect, useState} from "react"
-import {SuperUserService} from "@/services/super-user-service"
-import {ProgramService} from "@/services/program-service"
+import {SupabaseSuperUserService} from "@/services/supabase-super-user-service"
+import {SupabaseProgramService} from "@/services/supabase-program-service"
 import type {Company, Company_Admin} from "@/types/user"
 import type {CompanyProgram, Program} from "@/types/program"
-import {CompanyService} from "@/services/company-service";
+import {SupabaseCompanyService} from "@/services/supabase-company-service";
 
 export default function SuperuserCompanyMng() {
     const [companies, setCompanies] = useState<Company[]>([]) // 회사 목록
@@ -46,7 +46,7 @@ export default function SuperuserCompanyMng() {
     const loadCompanies = async () => {
         setIsLoading(true)
         try {
-            const data = await CompanyService.getCompanies()
+            const data = await SupabaseCompanyService.getCompanies()
             setCompanies(data.filter((company) => company.isActive))
         } catch (error) {
             console.error("회사 목록 로드 실패:", error)
@@ -58,7 +58,7 @@ export default function SuperuserCompanyMng() {
     /* 전체 프로그램 목록 */
     const loadAllPrograms = async () => {
         try {
-            const data = await ProgramService.getPrograms()
+            const data = await SupabaseProgramService.getPrograms()
             setAllPrograms(data)
         } catch (error) {
             console.error("프로그램 목록 로드 실패:", error)
@@ -68,7 +68,7 @@ export default function SuperuserCompanyMng() {
     /* 선택된 회사코드의 관리자 조회 */
     const loadCompanyAdmins = async (companyCode: string) => {
         try {
-            const data = await SuperUserService.getCompanyAdmins(companyCode)
+            const data = await SupabaseSuperUserService.getCompanyAdmins(companyCode)
             console.log("선택된 회사별 관리자 : ")
             console.log(data)
             setCompanyAdmins(data)
@@ -80,7 +80,7 @@ export default function SuperuserCompanyMng() {
     /* 선택된 회사코드의 프로그램 조회 */
     const loadCompanyPrograms = async (companyCode: string) => {
         try {
-            const data = await ProgramService.getCompanyPrograms(companyCode)
+            const data = await SupabaseProgramService.getCompanyPrograms(companyCode)
             console.log("선택된 회사의 프로그램 : ")
             console.log(data)
             setCompanyPrograms(data)
@@ -104,7 +104,7 @@ export default function SuperuserCompanyMng() {
 
         setIsLoading(true)
         try {
-            const success = await SuperUserService.createCompany(companyFormData)
+            const success = await SupabaseSuperUserService.createCompany(companyFormData)
             if (success) {
                 alert("회사가 등록되었습니다.")
                 setIsCompanyDialogOpen(false)
@@ -129,7 +129,7 @@ export default function SuperuserCompanyMng() {
 
         setIsLoading(true)
         try {
-            const success = await SuperUserService.createCompanyAdmin({
+            const success = await SupabaseSuperUserService.createCompanyAdmin({
                 companyCode: selectedCompany.code,
                 userId: adminFormData.userId,
                 password: adminFormData.password,
@@ -157,7 +157,7 @@ export default function SuperuserCompanyMng() {
 
         setIsLoading(true)
         try {
-            const success = await SuperUserService.deleteCompanyAdmin(adminId)
+            const success = await SupabaseSuperUserService.deleteCompanyAdmin(adminId)
             if (success) {
                 alert("관리자가 삭제되었습니다.")
                 if (selectedCompany) {
@@ -181,8 +181,8 @@ export default function SuperuserCompanyMng() {
 
         try {
             const success = isConnected
-                ? await ProgramService.disconnectCompanyProgram(selectedCompany.code, programId)
-                : await ProgramService.connectCompanyProgram(selectedCompany.code, programId)
+                ? await SupabaseProgramService.disconnectCompanyProgram(selectedCompany.code, programId)
+                : await SupabaseProgramService.connectCompanyProgram(selectedCompany.code, programId)
 
             if (success) {
                 await loadCompanyPrograms(selectedCompany.code)

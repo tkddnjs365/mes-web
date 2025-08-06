@@ -4,7 +4,7 @@ import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapp
 import {CommonCode, Item} from "@/types/data-sql";
 import {useEffect, useRef, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
-import {DataSql} from "@/services/data-sql";
+import {DataSql} from "@/services/supabase-data-sql";
 import {ColDef, ICellRendererParams} from "ag-grid-community";
 import {formatToKoreanDate} from "@/utils/data-format";
 import {CommonToolbar} from "@/components/common/common-toolbar";
