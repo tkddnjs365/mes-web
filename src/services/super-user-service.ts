@@ -1,12 +1,12 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {Company_Admin, SuperUser} from "@/types/user"
-import {SupabaseCompanyService} from "@/services/supabase-company-service";
+import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
 
 // 비밀번호 해싱
 const saltRounds = 10;
 
-export class SupabaseSuperUserService {
+export class SuperUserService {
 
     // 슈퍼유저 로그인 (O)
     static async loginSuperUser(userId: string, password: string): Promise<SuperUser | null> {
@@ -70,7 +70,7 @@ export class SupabaseSuperUserService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await SupabaseCompanyService.getCompanies_code(adminData.companyCode)
+            const comp_data = await CompanyService.getCompanies_code(adminData.companyCode)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;

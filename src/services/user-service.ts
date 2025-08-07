@@ -1,13 +1,13 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
-import {SupabaseCompanyService} from "@/services/supabase-company-service";
+import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
 
 // 비밀번호 해싱
 const saltRounds = 10;
 
-export class SupabaseUserService {
+export class UserService {
     // 로그인 (O)
     static async login(companyCode: string, userId: string, password: string): Promise<User | null> {
         try {
@@ -90,7 +90,7 @@ export class SupabaseUserService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await SupabaseCompanyService.getCompanies_idx(company_idx)
+            const comp_data = await CompanyService.getCompanies_idx(company_idx)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return []
@@ -171,7 +171,7 @@ export class SupabaseUserService {
             if (fetchError || !pendingUser) return false
 
             // 회사 정보 가져오기
-            const comp_data = await SupabaseCompanyService.getCompanies_code(pendingUser.company_code)
+            const comp_data = await CompanyService.getCompanies_code(pendingUser.company_code)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;

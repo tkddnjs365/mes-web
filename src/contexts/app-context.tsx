@@ -3,8 +3,8 @@
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import type {SuperUser, User} from "@/types/user"
 import {getAuthToken, removeAuthToken, saveAuthToken} from "@/lib/auth";
-import {SupabaseUserService} from "@/services/supabase-user-service";
-import {SupabaseSuperUserService} from "@/services/supabase-super-user-service";
+import {UserService} from "@/services/user-service";
+import {SuperUserService} from "@/services/super-user-service";
 
 interface AppContextType {
     currentUser: User | null
@@ -59,7 +59,7 @@ export function AppProvider({children}: { children: ReactNode }) {
     const login = async (companyCode: string, userId: string, password: string): Promise<boolean> => {
         try {
             setIsLoading(true)
-            const user = await SupabaseUserService.login(companyCode, userId, password)
+            const user = await UserService.login(companyCode, userId, password)
 
             if (user) {
                 setCurrentUser(user)
@@ -80,7 +80,7 @@ export function AppProvider({children}: { children: ReactNode }) {
         try {
             setIsLoading(true)
             if (userId === "super00") {
-                const superUser = await SupabaseSuperUserService.loginSuperUser(userId, password)
+                const superUser = await SuperUserService.loginSuperUser(userId, password)
 
                 if (superUser) {
                     setCurrentSuperUser(superUser)
@@ -88,7 +88,7 @@ export function AppProvider({children}: { children: ReactNode }) {
                     return true
                 }
             } else if (userId === "super00_mar") {
-                const superUser = await SupabaseSuperUserService.loginSuperUser(userId, password)
+                const superUser = await SuperUserService.loginSuperUser(userId, password)
 
                 if (superUser) {
                     setCurrentSuperUser(superUser)
@@ -120,7 +120,7 @@ export function AppProvider({children}: { children: ReactNode }) {
         name: string
     }): Promise<boolean> => {
         try {
-            return await SupabaseUserService.requestSignup(signupData)
+            return await UserService.requestSignup(signupData)
         } catch (error) {
             console.error("회원가입 요청 오류:", error)
             return false

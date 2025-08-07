@@ -1,7 +1,7 @@
 "use client"
 
 import {useEffect, useState} from "react"
-import {SupabaseProgramService} from "@/services/supabase-program-service"
+import {ProgramService} from "@/services/program-service"
 import type {Program} from "@/types/program"
 
 export default function SuperuserProgMng() {
@@ -24,7 +24,7 @@ export default function SuperuserProgMng() {
     const loadPrograms = async () => {
         setIsLoading(true)
         try {
-            const data = await SupabaseProgramService.getPrograms()
+            const data = await ProgramService.getPrograms()
             setPrograms(data)
         } catch (error) {
             console.error("프로그램 목록 로드 실패:", error)
@@ -43,7 +43,7 @@ export default function SuperuserProgMng() {
         setIsLoading(true)
 
         try {
-            const success = await SupabaseProgramService.createProgram(formData)
+            const success = await ProgramService.createProgram(formData)
             if (success) {
                 alert("프로그램이 등록되었습니다.")
                 setIsDialogOpen(false)
@@ -68,7 +68,7 @@ export default function SuperuserProgMng() {
 
         setIsLoading(true)
         try {
-            const success = await SupabaseProgramService.updateProgram(editingProgram.id, {
+            const success = await ProgramService.updateProgram(editingProgram.id, {
                 ...formData,
             })
             if (success) {
@@ -92,7 +92,7 @@ export default function SuperuserProgMng() {
 
         setIsLoading(true)
         try {
-            const success = await SupabaseProgramService.deleteProgram(programId)
+            const success = await ProgramService.deleteProgram(programId)
             if (success) {
                 alert("프로그램이 삭제되었습니다.")
                 await loadPrograms()

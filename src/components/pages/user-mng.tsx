@@ -2,9 +2,9 @@
 
 import {useEffect, useState} from "react"
 import {useAppContext} from "@/contexts/app-context"
-import {SupabaseUserService} from "@/services/supabase-user-service"
+import {UserService} from "@/services/user-service"
 import type {PendingUser, User} from "@/types/user"
-import {SupabaseProgramService} from "@/services/supabase-program-service";
+import {ProgramService} from "@/services/program-service";
 import {Prog_Menu_Company} from "@/types/program";
 import {LoadingSpinner} from "@/components/loading-spiner";
 
@@ -29,7 +29,7 @@ export default function UserMng() {
     useEffect(() => {
         const fetchPermissions = async () => {
             if (selectedUser) {
-                const permissions = await SupabaseProgramService.getProgMenuComany(selectedUser?.company_idx);
+                const permissions = await ProgramService.getProgMenuComany(selectedUser?.company_idx);
 
                 const grouped = permissions.reduce(
                     (acc, permission) => {
@@ -53,8 +53,8 @@ export default function UserMng() {
         setIsLoading(true)
         try {
             const [pending, approved] = await Promise.all([
-                SupabaseUserService.getPendingUsers(currentUser?.company_idx),
-                SupabaseUserService.getApprovedUsers(currentUser?.company_idx),
+                UserService.getPendingUsers(currentUser?.company_idx),
+                UserService.getApprovedUsers(currentUser?.company_idx),
             ])
             setPendingUsers(pending)
 
@@ -72,7 +72,7 @@ export default function UserMng() {
         try {
             if (!confirm("사용자를 승인 하시겠습니까?")) return
 
-            const success = await SupabaseUserService.approveUser(pendingUserId)
+            const success = await UserService.approveUser(pendingUserId)
             if (success) {
                 await loadData()
                 alert("사용자가 승인되었습니다.")
@@ -90,7 +90,7 @@ export default function UserMng() {
         if (!confirm("정말로 이 사용자를 거부하시겠습니까?")) return
 
         try {
-            const success = await SupabaseUserService.rejectUser(pendingUserId)
+            const success = await UserService.rejectUser(pendingUserId)
             if (success) {
                 await loadData()
                 alert("사용자가 거부되었습니다.")
@@ -114,7 +114,7 @@ export default function UserMng() {
         if (!selectedUser) return
 
         try {
-            const success = await SupabaseUserService.updateUserPermissions(selectedUser.id, selectedPermissions)
+            const success = await UserService.updateUserPermissions(selectedUser.id, selectedPermissions)
             if (success) {
                 await loadData()
                 setSelectedUser(null)
