@@ -2,9 +2,158 @@ import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {CommonCode, Item, ItemInsertData} from "@/types/data-sql";
 
 export class DataSql {
-
     /* 공통데이터 조회 */
-    static async get_comm_code(company_idx: string, group_id: string): Promise<CommonCode[]> {
+    static async get_comm_code(companyIdx: string, group_id: string): Promise<CommonCode[]> {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/select`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({groupId: group_id, companyIdx}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("실패:", res.statusText);
+                return [];
+            }
+
+            const data = await res.json();
+            return data.common.map((item: { value: string; dataId: string; }) => ({
+                label: item.value,
+                value: item.dataId
+            }));
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return [];
+        }
+    }
+
+    /* 품목 전체 조회 */
+    static async get_item_list(companyIdx: string, item: string, item_idx?: string, item_type?: string, item_yn?: string): Promise<Item[]> {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/item/itemSelect`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({companyIdx, item, itemIdx: item_idx, itemType: item_type, itemYn: item_yn}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("실패:", res.statusText);
+                return [];
+            }
+
+            const data = await res.json();
+
+            return data.itemList.map((item: {
+                companyIdx: string; itemIdx: string; itemCd: string; itemNm: string;
+                itemSpec: string; itemType: string; itemUnit: string; itemYn: string;
+                itemCreatedAt: string; itemUpdatedAt: string; itemEtc: string; itemTypeIdx: string;
+                itemUnitIdx: string;
+            }) => ({
+                companyIdx: item.companyIdx,
+                item_idx: item.itemIdx,
+                item_cd: item.itemCd,
+                item_nm: item.itemNm,
+                item_spec: item.itemSpec,
+                item_type: item.itemType,
+                item_unit: item.itemUnit,
+                item_yn: item.itemYn,
+                item_created_at: item.itemCreatedAt,
+                item_updated_at: item.itemUpdatedAt,
+                item_etc: item.itemEtc,
+                item_type_idx: item.itemTypeIdx,
+                item_unit_idx: item.itemUnitIdx,
+            }));
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return [];
+        }
+    }
+
+    /* 품목 저장 */
+    static async set_item_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
+        success: boolean;
+        error?: string;
+        item_idx?: string
+    }> {
+        try {
+            if (!save_data || save_data.length === 0) {
+                return {
+                    success: false,
+                    error: '저장할 데이터가 없습니다.'
+                };
+            }
+
+            const item = save_data[0];
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/item/itemSave`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        curItemIdx: cur_item_idx || "",
+                        companyIdx: item.companyIdx,
+                        itemCd: item.item_cd,
+                        itemNm: item.item_nm,
+                        itemSpec: item.item_spec,
+                        itemType: item.item_type,
+                        itemUnit: item.item_unit,
+                        useYn: item.use_yn,
+                        etc: item.etc
+                    }),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("API 요청 실패:", res.statusText);
+                return {
+                    success: false,
+                    error: `API 요청 실패: ${res.statusText}`
+                };
+            }
+
+            const data: {
+                success: boolean;
+                error?: string;
+                itemIdx?: string;
+            } = await res.json();
+
+            if (data.success) {
+                return {
+                    success: true,
+                    item_idx: data.itemIdx
+                };
+            } else {
+                return {
+                    success: false,
+                    error: data.error || '저장 실패'
+                };
+            }
+
+        } catch (error) {
+            console.error("품목 저장 오류:", error);
+            return {
+                success: false,
+                error: '저장 실패'
+            };
+        }
+    }
+
+    ///// supabase 연동 //////
+    /* 공통데이터 조회 */
+    static async get_comm_code_bak(companyIdx: string, group_id: string): Promise<CommonCode[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return []
@@ -15,7 +164,7 @@ export class DataSql {
                 .select('value, data_id')
                 .eq('group_id', group_id)
                 .eq('use_yn', true)
-                .eq('company_idx', company_idx)
+                .eq('companyIdx', companyIdx)
                 .order('value', {ascending: true});
 
             if (error) {
@@ -50,7 +199,7 @@ export class DataSql {
             const {data, error} = await supabase
                 .from('item_mst')
                 .select('item_idx')
-                .eq('company_idx', companyIdx)
+                .eq('companyIdx', companyIdx)
                 .eq('item_cd', itemCd.trim())
                 .limit(1);
 
@@ -67,7 +216,7 @@ export class DataSql {
     }
 
     /* 품목 전체 조회 */
-    static async get_item_list(company_idx: string, item: string, item_idx?: string, item_type?: string, item_yn?: string): Promise<Item[]> {
+    static async get_item_list_bak(companyIdx: string, item: string, item_idx?: string, item_type?: string, item_yn?: string): Promise<Item[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return []
@@ -76,7 +225,7 @@ export class DataSql {
             let query = supabase
                 .from("v_item_mst")
                 .select("*")
-                .eq("company_idx", company_idx);
+                .eq("companyIdx", companyIdx);
             if (item) {
                 query = query.or(`item_cd.ilike.%${item}%,item_nm.ilike.%${item}%`);
             }
@@ -97,7 +246,7 @@ export class DataSql {
             if (error || !data) return []
 
             return data.map((val) => ({
-                company_idx: val?.company_idx,
+                companyIdx: val?.companyIdx,
                 item_idx: val?.item_idx,
                 item_cd: val?.item_cd,
                 item_nm: val?.item_nm,
@@ -118,7 +267,7 @@ export class DataSql {
     }
 
     /* 품목 저장 */
-    static async set_item_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
+    static async set_item_list_bak(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
         success: boolean;
         error?: string;
         item_idx?: string
@@ -137,7 +286,7 @@ export class DataSql {
             if (cur_item_idx === "") {
                 // 중복 item_cd 확인
                 const isDuplicate = await this.checkDuplicateItemCode(
-                    item.company_idx,
+                    item.companyIdx,
                     item.item_cd
                 )
 
@@ -160,7 +309,7 @@ export class DataSql {
 
                 const {error} = await supabase.from("item_mst").insert({
                     item_idx: nextItemIdx,
-                    company_idx: item.company_idx,
+                    companyIdx: item.companyIdx,
                     item_cd: item.item_cd,
                     item_nm: item.item_nm,
                     item_spec: item.item_spec,
@@ -203,7 +352,7 @@ export class DataSql {
                 // 품목코드가 변경된 경우에만 중복 확인
                 if (existingItem.item_cd !== item.item_cd) {
                     const isDuplicate = await this.checkDuplicateItemCode(
-                        item.company_idx,
+                        item.companyIdx,
                         item.item_cd
                     );
 
@@ -228,7 +377,7 @@ export class DataSql {
                         updated_at: new Date().toISOString(),
                     })
                     .eq("item_idx", cur_item_idx)
-                    .eq("company_idx", item.company_idx)
+                    .eq("companyIdx", item.companyIdx)
                     .select('item_idx')
                     .single();
 

@@ -98,7 +98,7 @@ export default function SuperuserMenuMng() {
     /* 선택된 중메뉴의 프로그램 조회 */
     const loadMenuLinkPrograms = async (menuId: string) => {
         try {
-            const data = await ProgramService.getMenuLihkPrograms(menuId)
+            const data = await ProgramService.getMenuLinkPrograms(menuId)
             setMenuLinkPrograms(data)
         } catch (error) {
             console.error("회사 프로그램 목록 로드 실패:", error)

@@ -67,18 +67,18 @@ export default function ItemMngList() {
 
     // 컴포넌트 마운트 시 공통코드 로드
     useEffect(() => {
-        if (currentUser?.company_idx) {
+        if (currentUser?.companyIdx) {
             loadCommonCodes();
         }
     }, [currentUser]);
 
     /* 공통코드 로드 */
     const loadCommonCodes = async () => {
-        if (!currentUser?.company_idx) return;
+        if (!currentUser?.companyIdx) return;
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
+            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
@@ -93,8 +93,7 @@ export default function ItemMngList() {
             if (!currentUser) {
                 setRowData([])
             } else {
-                const data = await DataSql.get_item_list(currentUser.company_idx, searchCondition.item, "", searchCondition.item_type, searchCondition.item_yn)
-                console.log("품목 데이터 : ", data)
+                const data = await DataSql.get_item_list(currentUser.companyIdx, searchCondition.item, "", searchCondition.item_type, searchCondition.item_yn)
                 setRowData(data)
             }
         } catch (error) {

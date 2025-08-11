@@ -2,10 +2,7 @@
 export function formatToKoreanDate(value: string | Date | undefined | null): string {
     if (!value) return "";
 
-    const date = new Date(value);
-
-    // 한국 시간으로 변환 (UTC + 9시간)
-    const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+    const koreanTime = new Date(value);
 
     const year = koreanTime.getFullYear();
     const month = String(koreanTime.getMonth() + 1).padStart(2, "0");

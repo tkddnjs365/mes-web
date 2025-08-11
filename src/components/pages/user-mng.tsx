@@ -29,7 +29,7 @@ export default function UserMng() {
     useEffect(() => {
         const fetchPermissions = async () => {
             if (selectedUser) {
-                const permissions = await ProgramService.getProgMenuComany(selectedUser?.company_idx);
+                const permissions = await ProgramService.getProgMenuCompany(selectedUser?.companyIdx);
 
                 const grouped = permissions.reduce(
                     (acc, permission) => {
@@ -53,8 +53,8 @@ export default function UserMng() {
         setIsLoading(true)
         try {
             const [pending, approved] = await Promise.all([
-                UserService.getPendingUsers(currentUser?.company_idx),
-                UserService.getApprovedUsers(currentUser?.company_idx),
+                UserService.getPendingUsers(currentUser?.companyIdx),
+                UserService.getApprovedUsers(currentUser?.companyIdx),
             ])
             setPendingUsers(pending)
 
@@ -212,7 +212,7 @@ export default function UserMng() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div>
                                                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                                    <div className="text-sm text-gray-500">{user.user_id}</div>
+                                                    <div className="text-sm text-gray-500">{user.userId}</div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.company_code}</td>
@@ -280,7 +280,7 @@ export default function UserMng() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div>
                                                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                                    <div className="text-sm text-gray-500">{user.user_id}</div>
+                                                    <div className="text-sm text-gray-500">{user.userId}</div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -339,16 +339,16 @@ export default function UserMng() {
                                             <h3 className="font-semibold text-gray-900 mb-3">{category}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 {permissions.map((permission) => (
-                                                    <label key={permission.prog_idx}
+                                                    <label key={permission.progIdx}
                                                            className="flex items-center space-x-3 cursor-pointer">
                                                         <input
                                                             type="checkbox"
-                                                            checked={selectedPermissions.includes(permission.prog_idx)}
-                                                            onChange={() => togglePermission(permission.prog_idx)}
+                                                            checked={selectedPermissions.includes(permission.progIdx)}
+                                                            onChange={() => togglePermission(permission.progIdx)}
                                                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                         />
                                                         <span
-                                                            className="text-sm text-gray-700">{permission.prog_name}</span>
+                                                            className="text-sm text-gray-700">{permission.progName}</span>
                                                     </label>
                                                 ))}
                                             </div>

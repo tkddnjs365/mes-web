@@ -46,7 +46,7 @@ export default function SuperuserCompanyMng() {
     const loadCompanies = async () => {
         setIsLoading(true)
         try {
-            const data = await CompanyService.getCompanies()
+            const data = await CompanyService.getCompanies("admin")
             setCompanies(data.filter((company) => company.isActive))
         } catch (error) {
             console.error("회사 목록 로드 실패:", error)
@@ -69,8 +69,6 @@ export default function SuperuserCompanyMng() {
     const loadCompanyAdmins = async (companyCode: string) => {
         try {
             const data = await SuperUserService.getCompanyAdmins(companyCode)
-            console.log("선택된 회사별 관리자 : ")
-            console.log(data)
             setCompanyAdmins(data)
         } catch (error) {
             console.error("관리자 목록 로드 실패:", error)
@@ -81,8 +79,6 @@ export default function SuperuserCompanyMng() {
     const loadCompanyPrograms = async (companyCode: string) => {
         try {
             const data = await ProgramService.getCompanyPrograms(companyCode)
-            console.log("선택된 회사의 프로그램 : ")
-            console.log(data)
             setCompanyPrograms(data)
         } catch (error) {
             console.error("회사 프로그램 목록 로드 실패:", error)
@@ -320,19 +316,19 @@ export default function SuperuserCompanyMng() {
                                         ) : (
                                             <div className="space-y-2">
                                                 {companyAdmins.map((admin) => (
-                                                    <div key={admin.user_idx}
+                                                    <div key={admin.userIdx}
                                                          className="p-4 border border-gray-200 rounded-lg">
                                                         <div className="flex items-center justify-between">
                                                             <div>
                                                                 <div className="font-semibold">{admin.name}</div>
                                                                 <div
-                                                                    className="text-sm text-gray-600">ID: {admin.user_id}</div>
+                                                                    className="text-sm text-gray-600">ID: {admin.userId}</div>
                                                                 <div className="text-xs text-gray-500">
                                                                     등록일: {new Date(admin.createdAt).toLocaleDateString("ko-KR")}
                                                                 </div>
                                                             </div>
                                                             <button
-                                                                onClick={() => handleDeleteAdmin(admin.user_idx)}
+                                                                onClick={() => handleDeleteAdmin(admin.userIdx)}
                                                                 className="px-3 py-1 text-sm min-h-[36px] rounded-md font-medium transition-all cursor-pointer border border-gray-300 flex items-center justify-center bg-red-600 text-white hover:bg-red-700"
                                                                 disabled={isLoading}
                                                             >

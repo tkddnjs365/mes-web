@@ -62,22 +62,22 @@ export default function ItemMng() {
 
     // 컴포넌트 마운트 시 공통코드 로드
     useEffect(() => {
-        if (currentUser?.company_idx) {
+        if (currentUser?.companyIdx) {
             loadCommonCodes();
         }
     }, [currentUser]);
 
     /* 공통코드 로드 */
     const loadCommonCodes = async () => {
-        if (!currentUser?.company_idx) return;
+        if (!currentUser?.companyIdx) return;
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_type');
+            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
 
             // 품목단위 로드
-            const itemUnitData = await DataSql.get_comm_code(currentUser.company_idx, 'sys.item.item_unit');
+            const itemUnitData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_unit');
             setItemUnits([{label: "", value: ""}, ...itemUnitData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
@@ -92,7 +92,7 @@ export default function ItemMng() {
             if (!currentUser) {
                 setRowData([])
             } else {
-                const data = await DataSql.get_item_list(currentUser.company_idx, searchCondition.item)
+                const data = await DataSql.get_item_list(currentUser.companyIdx, searchCondition.item)
                 console.log("품목 데이터 : ", data)
                 setRowData(data)
             }
@@ -122,7 +122,7 @@ export default function ItemMng() {
                 return;
             }
 
-            const data = await DataSql.get_item_list(currentUser.company_idx, "", item_idx)
+            const data = await DataSql.get_item_list(currentUser.companyIdx, "", item_idx)
             console.log("선택된 품목 상세 데이터 : ", data)
 
             // 조회된 데이터가 있으면 saveCondition에 설정
@@ -204,7 +204,7 @@ export default function ItemMng() {
         }
 
         const itemData: ItemInsertData = {
-            company_idx: currentUser.company_idx,
+            companyIdx: currentUser.companyIdx,
             item_cd: saveCondition.item_cd,
             item_nm: saveCondition.item_nm,
             item_type: saveCondition.item_type,

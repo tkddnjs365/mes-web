@@ -3,12 +3,99 @@ import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
 import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
+import {ProgramService} from "@/services/program-service";
 
 // 비밀번호 해싱
 const saltRounds = 10;
 
+interface LoginResponse {
+    success: boolean;
+    message: string;
+    accessToken: string;
+    refreshToken: string;
+    user: User;
+}
+
 export class UserService {
+
+    /* 로그인 */
+    static login = async (companyCode: string, userId: string, password: string): Promise<User | null> => {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/login`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({userId, password}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("로그인 실패:", res.statusText);
+                return null;
+            }
+
+            const data: LoginResponse = await res.json();
+            console.log("로그인 성공:", data);
+            console.log("data.user:", data.user);
+
+            return data.user;
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return null;
+        }
+    };
+
+    /* 회사별 연결된 프로그램 전체 목록 */
+    static async getCompanyPrograms(companyIdx: string): Promise<ProgramWithDetails[]> {
+        try {
+            const resPrograms = await ProgramService.getCompanyPrograms(companyIdx);
+
+            const compProg: ProgramWithDetails[] = resPrograms.map((prog) => ({
+                id: prog.id,
+                programId: prog.programId,
+            }))
+
+            return compProg
+        } catch (error) {
+            console.error("회사 프로그램 조회 오류:", error)
+            return []
+        }
+    }
+
+
+
+
+
+
+
+    static async getUserPrograms(userId: string, companyCode: string): Promise<ProgramWithDetails[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return []
+            }
+
+            const {data, error} = await supabase
+                .from("user_programs")
+                .select("program_id")
+                .eq("userId", userId)
+                .eq("is_active", true)
+
+            if (error || !data) return []
+
+            return data.map((item) => item.program_id)
+        } catch (error) {
+            console.error("사용자 프로그램 조회 오류:", error)
+            return []
+        }
+    }
+
+
+    ///// supabase 연동 //////
     // 로그인 (O)
+    /*
     static async login(companyCode: string, userId: string, password: string): Promise<User | null> {
         try {
             if (!isSupabaseConfigured || !supabase) {
@@ -19,7 +106,7 @@ export class UserService {
                 .from("v_user_company")
                 .select("*")
                 .eq("company_code", companyCode)
-                .eq("user_id", userId)
+                .eq("userId", userId)
                 .maybeSingle();
 
             if (error || !data) {
@@ -38,11 +125,11 @@ export class UserService {
             }
 
             return {
-                id: data.user_idx,
-                user_id: data.user_id,
+                id: data.userIdx,
+                userId: data.userId,
                 name: data.name,
                 role: data.role,
-                company_idx: data.company_idx,
+                companyIdx: data.companyIdx,
                 permissions: data.permissions || [],
                 isApproved: data.is_approved,
                 createdAt: data.user_created_at,
@@ -53,6 +140,32 @@ export class UserService {
             return null
         }
     }
+    */
+
+    // 사용자별 프로그램 조회
+    /*
+    static async getUserPrograms(userId: string, companyCode: string): Promise<ProgramWithDetails[]> {
+        try {
+            if (!isSupabaseConfigured || !supabase) {
+                return []
+            }
+
+            const {data, error} = await supabase
+                .from("user_programs")
+                .select("program_id")
+                .eq("userId", userId)
+                .eq("is_active", true)
+
+            if (error || !data) return []
+
+            return data.map((item) => item.program_id)
+        } catch (error) {
+            console.error("사용자 프로그램 조회 오류:", error)
+            return []
+        }
+    }
+     */
+
 
     // 회원가입 요청 (O)
     static async requestSignup(signupData: {
@@ -69,7 +182,7 @@ export class UserService {
             console.log(signupData)
             const {error} = await supabase.from("pending_users").insert({
                 company_code: signupData.companyCode,
-                user_id: signupData.userId,
+                userId: signupData.userId,
                 password: signupData.password,
                 name: signupData.name,
                 created_at: new Date().toISOString(),
@@ -83,14 +196,14 @@ export class UserService {
     }
 
     // 대기 중인 사용자 목록 조회 (O)
-    static async getPendingUsers(company_idx?: string): Promise<PendingUser[]> {
+    static async getPendingUsers(companyIdx?: string): Promise<PendingUser[]> {
         try {
-            if (!isSupabaseConfigured || !supabase || !company_idx) {
+            if (!isSupabaseConfigured || !supabase || !companyIdx) {
                 return []
             }
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_idx(company_idx)
+            const comp_data = await CompanyService.getCompanies_idx(companyIdx)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return []
@@ -106,7 +219,7 @@ export class UserService {
             return data.map((user) => ({
                 id: user.id,
                 company_code: user.company_code,
-                user_id: user.user_id,
+                userId: user.userId,
                 password: user.password,
                 name: user.name,
                 createdAt: user.created_at,
@@ -118,7 +231,7 @@ export class UserService {
     }
 
     // 승인된 사용자 목록 조회 (O)
-    static async getApprovedUsers(company_idx?: string): Promise<User[]> {
+    static async getApprovedUsers(companyIdx?: string): Promise<User[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return []
@@ -128,8 +241,8 @@ export class UserService {
                 .from("users")
                 .select("*");
 
-            if (company_idx) {
-                query = query.eq("company_idx", company_idx)
+            if (companyIdx) {
+                query = query.eq("companyIdx", companyIdx)
             }
 
             const {data, error} = await query.order("created_at", {ascending: false})
@@ -138,8 +251,8 @@ export class UserService {
 
             return data.map((user) => ({
                 id: user?.id,
-                company_idx: user?.company_idx,
-                user_id: user?.user_id,
+                companyIdx: user?.companyIdx,
+                userId: user?.userId,
                 password: user?.password,
                 name: user?.name,
                 role: user?.role,
@@ -180,8 +293,8 @@ export class UserService {
             const {data: userSelect} = await supabase
                 .from("users")
                 .select("*")
-                .eq("company_idx", comp_data[0].id)
-                .eq("user_id", pendingUser.user_id);
+                .eq("companyIdx", comp_data[0].id)
+                .eq("userId", pendingUser.userId);
             if (Array.isArray(userSelect) && userSelect.length > 0) {
                 alert("동일한 사용자가 이미 추가 되어있습니다.")
                 return false;
@@ -191,7 +304,7 @@ export class UserService {
 
             // users 테이블에 추가
             const {error: userError} = await supabase.from("users").insert({
-                user_id: pendingUser.user_id,
+                userId: pendingUser.userId,
                 password: hashedPassword,
                 name: pendingUser.name,
                 role: "user",
@@ -199,7 +312,7 @@ export class UserService {
                 is_approved: true,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                company_idx: comp_data[0].id,
+                companyIdx: comp_data[0].id,
             })
 
             if (userError) return false
@@ -246,30 +359,8 @@ export class UserService {
         }
     }
 
-    // 사용자별 프로그램 조회
-    static async getUserPrograms(userId: string, companyCode: string): Promise<ProgramWithDetails[]> {
-        try {
-            if (!isSupabaseConfigured || !supabase) {
-                return []
-            }
-
-            const {data, error} = await supabase
-                .from("user_programs")
-                .select("program_id")
-                .eq("user_id", userId)
-                .eq("is_active", true)
-
-            if (error || !data) return []
-
-            return data.map((item) => item.program_id)
-        } catch (error) {
-            console.error("사용자 프로그램 조회 오류:", error)
-            return []
-        }
-    }
-
     // 회사별 프로그램 조회
-    static async getCompanyPrograms(company_idx: string): Promise<ProgramWithDetails[]> {
+    static async getCompanyPrograms_bak(companyIdx: string): Promise<ProgramWithDetails[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return []
@@ -278,7 +369,7 @@ export class UserService {
             const {data, error} = await supabase
                 .from("v_prog_company")
                 .select("prog_idx, link_idx")
-                .eq("company_idx", company_idx)
+                .eq("companyIdx", companyIdx)
 
             if (error || !data) return []
 

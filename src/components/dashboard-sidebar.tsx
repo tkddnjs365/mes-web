@@ -56,11 +56,11 @@ export default function DashboardSidebar({user, onMenuClick}: SidebarProps) {
 
                 if (user.role === "admin") {
                     // 관리자는 회사에 연결된 모든 프로그램 조회
-                    const programs = await UserService.getCompanyPrograms(user.company_idx)
+                    const programs = await UserService.getCompanyPrograms(user.companyIdx)
                     setCompanyPrograms(programs)
                 } else if (user.role === "user") {
                     // 일반 사용자는 자신에게 연결된 프로그램만 조회
-                    const programs = await UserService.getUserPrograms(user.id, user.company_idx)
+                    const programs = await UserService.getUserPrograms(user.id, user.companyIdx)
                     setUserPrograms(programs)
                 }
             } catch (error) {

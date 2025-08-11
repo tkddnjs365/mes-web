@@ -1,16 +1,160 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import {Company_Admin, SuperUser} from "@/types/user"
+import {Company_Admin, SuperUser, type User} from "@/types/user"
 import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
 
 // 비밀번호 해싱
 const saltRounds = 10;
 
-export class SuperUserService {
+interface LoginResponse {
+    success: boolean;
+    message: string;
+    accessToken: string;
+    refreshToken: string;
+    user: User;
+}
 
-    // 슈퍼유저 로그인 (O)
-    static async loginSuperUser(userId: string, password: string): Promise<SuperUser | null> {
+export class SuperUserService {
+    /* 로그인 */
+    static loginSuperUser = async (userId: string, password: string): Promise<User | null> => {
         try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/login`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({userId, password}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("로그인 실패:", res.statusText);
+                return null;
+            }
+
+            const data: LoginResponse = await res.json();
+            console.log("로그인 성공:", data);
+            console.log("data.user:", data.user);
+
+            return data.user;
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return null;
+        }
+    };
+
+    /* 회사 추가 */
+    static async createCompany(companyData: { code: string; name: string; description: string }): Promise<boolean> {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/createCompany`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(companyData),
+            });
+
+            if (!res.ok) {
+                console.error("createCompany 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("회사 추가 오류:", error)
+            return false
+        }
+    }
+
+    /* 회사별 관리자 조회 */
+    static async getCompanyAdmins(companyCode: string): Promise<Company_Admin[]> {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/getCompanyAdmin/${companyCode}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (!res.ok) {
+                console.error("API 통신 실패:", res.statusText);
+                return [];
+            }
+
+            const data = await res.json();
+            return data.companyAdminDtoList || [];
+        } catch (error) {
+            console.error("조회 오류:", error)
+            return []
+        }
+    }
+
+    /* 회사별 관리자 추가 */
+    static async createCompanyAdmin(adminData: {
+        companyCode: string;
+        userId: string;
+        password: string;
+        name: string
+    }): Promise<boolean> {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/createCompanyAdmin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(adminData),
+            });
+
+            if (!res.ok) {
+                console.error("createCompanyAdmin 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("회사 관리자 추가 오류:", error)
+            return false
+        }
+    }
+
+    /* 회사별 관리자 삭제 */
+    static async deleteCompanyAdmin(adminId: string): Promise<boolean> {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/deleteCompanyAdmin/${adminId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!isSupabaseConfigured || !supabase) {
+                return false
+            }
+
+            if (!res.ok) {
+                console.error("deleteCompanyAdmin 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("회사 관리자 삭제 오류:", error)
+            return false
+        }
+    }
+
+
+    ///// supabase 연동 //////
+    // 슈퍼유저 로그인 (O)
+    static async loginSuperUser_bak(userId: string, password: string): Promise<SuperUser | null> {
+        try {
+            return null
+            /*
             if (!isSupabaseConfigured || !supabase) {
                 return null
             }
@@ -18,7 +162,7 @@ export class SuperUserService {
             const {data, error} = await supabase
                 .from("super_users")
                 .select("*")
-                .eq("user_id", userId)
+                .eq("userId", userId)
                 .eq("password", password)
                 .single()
 
@@ -26,11 +170,12 @@ export class SuperUserService {
 
             return {
                 id: data.id,
-                user_id: data.user_id,
+                userId: data.userId,
                 name: data.name,
                 permissions: data.permissions || [],
                 role: data.role,
             }
+             */
         } catch (error) {
             console.error("슈퍼유저 로그인 오류:", error)
             return null
@@ -38,7 +183,7 @@ export class SuperUserService {
     }
 
     // 회사 추가 (O)
-    static async createCompany(companyData: { code: string; name: string; description: string }): Promise<boolean> {
+    static async createCompany_bak(companyData: { code: string; name: string; description: string }): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return false
@@ -58,7 +203,7 @@ export class SuperUserService {
     }
 
     // 회사 관리자 추가 (O)
-    static async createCompanyAdmin(adminData: {
+    static async createCompanyAdmin_bak(adminData: {
         companyCode: string;
         userId: string;
         password: string;
@@ -76,12 +221,12 @@ export class SuperUserService {
                 return false;
             }
 
-            const company_idx = comp_data[0].id;
+            const companyIdx = comp_data[0].id;
             const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
 
             // users 테이블에도 추가 (로그인을 위해)
             const {error: userError} = await supabase.from("users").insert({
-                user_id: adminData.userId,
+                userId: adminData.userId,
                 password: hashedPassword,
                 name: adminData.name,
                 role: "admin",
@@ -89,7 +234,7 @@ export class SuperUserService {
                 is_approved: true,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                company_idx: company_idx
+                companyIdx: companyIdx
             })
 
             return !userError
@@ -100,8 +245,10 @@ export class SuperUserService {
     }
 
     // 회사 관리자 목록 조회 (O)
-    static async getCompanyAdmins(companyCode: string): Promise<Company_Admin[]> {
+    static async getCompanyAdmins_bak(companyCode: string): Promise<Company_Admin[]> {
         try {
+            return []
+            /*
             if (!isSupabaseConfigured || !supabase) {
                 return []
             }
@@ -120,14 +267,14 @@ export class SuperUserService {
             if (error || !data) return [];
 
             return data.map((user) => ({
-                user_idx: user.user_idx,
-                user_id: user.user_id,
+                userIdx: user.userIdx,
+                userId: user.userId,
                 name: user.name,
                 createdAt: user.created_at,
-                company_idx: user.companies?.[0]?.id ?? null, // ← 배열에서 첫 번째 접근
+                companyIdx: user.companies?.[0]?.id ?? null, // ← 배열에서 첫 번째 접근
                 company_code: user.companies?.[0]?.code ?? null,
             }));
-
+             */
         } catch (error) {
             console.error("회사 관리자 목록 조회 오류:", error)
             return []
@@ -135,7 +282,7 @@ export class SuperUserService {
     }
 
     // 회사 관리자 삭제 (O)
-    static async deleteCompanyAdmin(adminId: string): Promise<boolean> {
+    static async deleteCompanyAdmin_bak(adminId: string): Promise<boolean> {
         try {
             if (!isSupabaseConfigured || !supabase) {
                 return false

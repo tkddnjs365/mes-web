@@ -6,7 +6,7 @@ export interface CommonCode {
 
 /* 품목 조회용 */
 export interface Item {
-    company_idx: string;
+    companyIdx: string;
     item_idx: string;
     item_cd: string;
     item_nm: string;
@@ -23,7 +23,7 @@ export interface Item {
 
 /* 품목 저장 용 */
 export interface ItemInsertData {
-  company_idx: string;
+  companyIdx: string;
   item_cd: string;
   item_nm: string;
   item_spec: string | null;

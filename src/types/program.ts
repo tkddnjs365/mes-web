@@ -49,18 +49,25 @@ export interface MenuLinkProgram {
 
 export interface ProgramWithDetails {
   id: string
-  programId: number
+  programId: string
 }
 
 export interface MenuItem {
     id: string
     title: string
     children?: MenuItem[]
-    programId?: number
+    programId?: string
 }
 
 export interface Prog_Menu_Company{
-  prog_idx: string
-  prog_name : string
-  menu_name : string
+  progIdx: string
+  progName : string
+  menuName : string
+}
+
+export interface ProgMenu{
+  progIdx: string
+  progName : string
+  menuIdx : string
+  progPath : string
 }

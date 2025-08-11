@@ -1,11 +1,98 @@
 "use client"
 
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {AlertCircle, DollarSign, Package, ShoppingCart, TrendingUp, Users} from 'lucide-react';
 
 export const DashBoardMain = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('이번달');
+    const [isChartReady, setIsChartReady] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [containerDimensions, setContainerDimensions] = useState({width: 0, height: 0});
+    const barChartRef = useRef<HTMLDivElement>(null);
+    const pieChartRef = useRef<HTMLDivElement>(null);
+
+    // 컨테이너 크기 감지 및 차트 준비
+    useEffect(() => {
+        const updateDimensions = () => {
+            if (barChartRef.current) {
+                const rect = barChartRef.current.getBoundingClientRect();
+                setContainerDimensions({
+                    width: rect.width,
+                    height: rect.height
+                });
+            }
+        };
+
+        // 초기 크기 설정
+        updateDimensions();
+
+        // 리사이즈 이벤트 리스너
+        const resizeObserver = new ResizeObserver(() => {
+            updateDimensions();
+        });
+
+        if (barChartRef.current) {
+            resizeObserver.observe(barChartRef.current);
+        }
+
+        // 차트 렌더링 준비 - 컨테이너 크기가 설정된 후에 활성화
+        const timer = setTimeout(() => {
+            updateDimensions();
+            setIsChartReady(true);
+        }, 200);
+
+        return () => {
+            clearTimeout(timer);
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    // 페이지 visibility 변경 감지
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                setIsVisible(false);
+            } else {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    setIsVisible(true);
+                    // visibility가 변경될 때도 차트 크기를 다시 확인
+                    if (barChartRef.current) {
+                        const rect = barChartRef.current.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            setIsChartReady(true);
+                        }
+                    }
+                }, 300);
+            }
+        };
+
+        const handleFocus = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                setIsVisible(true);
+                setIsChartReady(true);
+            }, 200);
+        };
+
+        const handleBlur = () => {
+            setIsVisible(false);
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('blur', handleBlur);
+
+        return () => {
+            clearTimeout(timeoutId);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, []);
 
     // 정적 데이터를 useMemo로 메모이제이션하여 리렌더링 방지
     const salesData = useMemo(() => [
@@ -48,8 +135,11 @@ export const DashBoardMain = () => {
         {item: 'A-006 품목6', lot: '6 LOT', workQty: 180, defectQty: 2}
     ], []);
 
+    // 차트 렌더링 조건 확인
+    const shouldRenderCharts = isChartReady && isVisible && containerDimensions.width > 0;
+
     return (
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 min-h-screen">
             {/* 헤더 */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div
@@ -163,7 +253,7 @@ export const DashBoardMain = () => {
             </div>
 
             {/* 차트 섹션 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 min-h-[400px]">
                 {/* 월별 매출 현황 */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
@@ -173,37 +263,53 @@ export const DashBoardMain = () => {
                         </div>
                     </div>
                     <div className="p-2">
-                        <div className="w-full h-[350px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={salesData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
-                                    <XAxis
-                                        dataKey="month"
-                                        tick={{fontSize: 12, fill: '#374151'}}
-                                        tickLine={{stroke: '#9CA3AF'}}
-                                        axisLine={{stroke: '#9CA3AF'}}
-                                        interval={0}
-                                        scale="band"
-                                        angle={-45}
-                                        textAnchor="end"
-                                        minTickGap={10}
-                                    />
-                                    <YAxis
-                                        tick={{fontSize: 12, fill: '#374151'}}
-                                        tickLine={{stroke: '#9CA3AF'}}
-                                        axisLine={{stroke: '#9CA3AF'}}
-                                    />
-                                    <Tooltip
-                                        formatter={(value) => [`${value.toLocaleString()}만원`, '매출액']}
-                                        contentStyle={{
-                                            backgroundColor: '#FFFFFF',
-                                            border: '1px solid #E5E7EB',
-                                            borderRadius: '6px'
-                                        }}
-                                    />
-                                    <Bar dataKey="amount" fill="#3B82F6"/>
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div
+                            ref={barChartRef}
+                            className="w-full h-[350px] min-w-0 min-h-0"
+                            style={{minWidth: '300px', minHeight: '300px'}}
+                        >
+                            {shouldRenderCharts ? (
+                                <ResponsiveContainer
+                                    width="100%"
+                                    height="100%"
+                                    debounce={200}
+                                    minWidth={300}
+                                    minHeight={300}
+                                >
+                                    <BarChart data={salesData} margin={{top: 20, right: 30, left: 20, bottom: 20}}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0"/>
+                                        <XAxis
+                                            dataKey="month"
+                                            tick={{fontSize: 12, fill: '#374151'}}
+                                            tickLine={{stroke: '#9CA3AF'}}
+                                            axisLine={{stroke: '#9CA3AF'}}
+                                            interval={0}
+                                            scale="band"
+                                            angle={-45}
+                                            textAnchor="end"
+                                            minTickGap={10}
+                                        />
+                                        <YAxis
+                                            tick={{fontSize: 12, fill: '#374151'}}
+                                            tickLine={{stroke: '#9CA3AF'}}
+                                            axisLine={{stroke: '#9CA3AF'}}
+                                        />
+                                        <Tooltip
+                                            formatter={(value) => [`${value.toLocaleString()}만원`, '매출액']}
+                                            contentStyle={{
+                                                backgroundColor: '#FFFFFF',
+                                                border: '1px solid #E5E7EB',
+                                                borderRadius: '6px'
+                                            }}
+                                        />
+                                        <Bar dataKey="amount" fill="#3B82F6"/>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-full bg-gray-50">
+                                    <div className="text-gray-400">차트를 로딩중...</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -216,27 +322,45 @@ export const DashBoardMain = () => {
                             <h3 className="text-base font-semibold text-gray-800">수주 현황</h3>
                         </div>
                     </div>
-                    <div className="p-1">
-                        <div className="flex justify-center">
-                            <PieChart width={350} height={300}>
-                                <Pie
-                                    data={orderStatusData}
-                                    cx={175}
-                                    cy={140}
-                                    outerRadius={80}
-                                    dataKey="value"
-                                    animationBegin={0}
-                                    animationDuration={0}
+                    <div className="p-2">
+                        <div
+                            ref={pieChartRef}
+                            className="w-full h-[300px] min-w-0 min-h-0"
+                            style={{minWidth: '250px', minHeight: '250px'}}
+                        >
+                            {shouldRenderCharts ? (
+                                <ResponsiveContainer
+                                    width="100%"
+                                    height="100%"
+                                    debounce={200}
+                                    minWidth={250}
+                                    minHeight={250}
                                 >
-                                    {orderStatusData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color}/>
-                                    ))}
-                                </Pie>
-                                <Tooltip formatter={(value) => [`${value}건`, '']}/>
-                            </PieChart>
+                                    <PieChart>
+                                        <Pie
+                                            data={orderStatusData}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={80}
+                                            dataKey="value"
+                                            animationBegin={0}
+                                            animationDuration={800}
+                                        >
+                                            {orderStatusData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color}/>
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(value) => [`${value}건`, '']}/>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-full bg-gray-50">
+                                    <div className="text-gray-400">차트를 로딩중...</div>
+                                </div>
+                            )}
                         </div>
                         {/* 범례 */}
-                        <div className="flex justify-center space-x-4 mt-1">
+                        <div className="flex justify-center space-x-4 mt-2">
                             {orderStatusData.map((item, index) => (
                                 <div key={index} className="flex items-center">
                                     <div
@@ -261,7 +385,7 @@ export const DashBoardMain = () => {
                             <h3 className="text-base font-semibold text-gray-800">품목별 수주 현황</h3>
                         </div>
                     </div>
-                    <div className="p-3" style={{height: '200px', overflowY: 'auto'}}>
+                    <div className="p-3" style={{height: '250px', overflowY: 'auto'}}>
                         <div className="space-y-2">
                             {inventoryAlerts.map((alert, index) => (
                                 <div key={index} className="p-3 bg-gray-50 rounded-lg">
@@ -303,7 +427,7 @@ export const DashBoardMain = () => {
                             <h3 className="text-base font-semibold text-gray-800">생산 현황</h3>
                         </div>
                     </div>
-                    <div className="p-3" style={{height: '200px', overflowY: 'auto'}}>
+                    <div className="p-3" style={{height: '250px', overflowY: 'auto'}}>
                         <div className="space-y-2">
                             {productionData.map((item, index) => (
                                 <div key={index} className="p-3 bg-gray-50 rounded-lg">
