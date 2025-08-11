@@ -10,6 +10,7 @@ import {
 } from "@/types/program"
 import {CompanyService} from "@/services/company-service";
 import {DashBoardMain} from "@/components/dashboard-main"
+import utilsUrl from "@/utils/utilsUrl";
 
 /* 프로그램 연결 */
 const componentMap: Record<string, () => Promise<{ default: React.ComponentType }>> = {
@@ -50,7 +51,7 @@ export class ProgramService {
     static async getPrograms(): Promise<Program[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program`,
+                `${utilsUrl.REST_API_URL}/program`,
                 {
                     method: "GET",
                     headers: {
@@ -79,7 +80,7 @@ export class ProgramService {
         description: string;
     }): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/progCreate`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/progCreate`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -114,7 +115,7 @@ export class ProgramService {
         },
     ): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/progUpdate`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/progUpdate`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -143,7 +144,7 @@ export class ProgramService {
     /* 프로그램 삭제 */
     static async deleteProgram(programId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/progDelete`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/progDelete`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -167,7 +168,7 @@ export class ProgramService {
     static async getCompanyPrograms(companyCode: string): Promise<CompanyProgram[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/companyProg/${companyCode}`,
+                `${utilsUrl.REST_API_URL}/program/companyProg/${companyCode}`,
                 {
                     method: "GET",
                     headers: {
@@ -192,7 +193,7 @@ export class ProgramService {
     /* 회사-프로그램 연결 */
     static async connectCompanyProgram(companyCode: string, programId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/connectCompProg`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/connectCompProg`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -215,7 +216,7 @@ export class ProgramService {
     /* 회사-프로그램 연결 해제 */
     static async disconnectCompanyProgram(companyCode: string, programId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/disConnectCompProg`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/disConnectCompProg`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -239,7 +240,7 @@ export class ProgramService {
     static async getProgMenuCompany(companyIdx: string): Promise<Prog_Menu_Company[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/progMenu/${companyIdx}`,
+                `${utilsUrl.REST_API_URL}/program/progMenu/${companyIdx}`,
                 {
                     method: "GET",
                     headers: {
@@ -265,7 +266,7 @@ export class ProgramService {
     static async getMenuCategories(): Promise<MenuCategory[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/menuCategory`,
+                `${utilsUrl.REST_API_URL}/program/menuCategory`,
                 {
                     method: "GET",
                     headers: {
@@ -297,7 +298,7 @@ export class ProgramService {
     }): Promise<boolean> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/menuCreate`,
+                `${utilsUrl.REST_API_URL}/program/menuCreate`,
                 {
                     method: "POST",
                     headers: {
@@ -323,7 +324,7 @@ export class ProgramService {
     static async getMenuLinkPrograms(menuId: string): Promise<MenuLinkProgram[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/menuProg/${menuId}`,
+                `${utilsUrl.REST_API_URL}/program/menuProg/${menuId}`,
                 {
                     method: "GET",
                     headers: {
@@ -348,7 +349,7 @@ export class ProgramService {
     /* 중메뉴 프로그램 연결 */
     static async connectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/menuProgConnect`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/menuProgConnect`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -371,7 +372,7 @@ export class ProgramService {
     /* 중메뉴 프로그램 연결 해제 */
     static async disconnectMenuProgram(menuId: string, programId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/program/menuProgDisConnect`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/menuProgDisConnect`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -399,7 +400,7 @@ export class ProgramService {
 
             // 2. 메뉴-프로그램 연결 정보와 프로그램 정보 조회
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/program/getMenuProg`,
+                `${utilsUrl.REST_API_URL}/program/getMenuProg`,
                 {
                     method: "GET",
                     headers: {

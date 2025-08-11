@@ -2,6 +2,7 @@ import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {Company_Admin, SuperUser, type User} from "@/types/user"
 import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
+import utilsUrl from "@/utils/utilsUrl";
 
 // 비밀번호 해싱
 const saltRounds = 10;
@@ -19,7 +20,7 @@ export class SuperUserService {
     static loginSuperUser = async (userId: string, password: string): Promise<User | null> => {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/login`,
+                `${utilsUrl.REST_API_URL}/superUser/login`,
                 {
                     method: "POST",
                     headers: {
@@ -48,7 +49,7 @@ export class SuperUserService {
     /* 회사 추가 */
     static async createCompany(companyData: { code: string; name: string; description: string }): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/createCompany`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/superUser/createCompany`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export class SuperUserService {
     static async getCompanyAdmins(companyCode: string): Promise<Company_Admin[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/getCompanyAdmin/${companyCode}`,
+                `${utilsUrl.REST_API_URL}/superUser/getCompanyAdmin/${companyCode}`,
                 {
                     method: "GET",
                     headers: {
@@ -102,7 +103,7 @@ export class SuperUserService {
         name: string
     }): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/createCompanyAdmin`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/superUser/createCompanyAdmin`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -125,7 +126,7 @@ export class SuperUserService {
     /* 회사별 관리자 삭제 */
     static async deleteCompanyAdmin(adminId: string): Promise<boolean> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/superUser/deleteCompanyAdmin/${adminId}`, {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/superUser/deleteCompanyAdmin/${adminId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

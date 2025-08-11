@@ -4,6 +4,7 @@ import type {ProgramWithDetails} from "@/types/program"
 import {CompanyService} from "@/services/company-service";
 import bcrypt from "bcryptjs";
 import {ProgramService} from "@/services/program-service";
+import utilsUrl from "@/utils/utilsUrl";
 
 // 비밀번호 해싱
 const saltRounds = 10;
@@ -22,7 +23,7 @@ export class UserService {
     static login = async (companyCode: string, userId: string, password: string): Promise<User | null> => {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/login`,
+                `${utilsUrl.REST_API_URL}/user/login`,
                 {
                     method: "POST",
                     headers: {
@@ -62,11 +63,6 @@ export class UserService {
             return []
         }
     }
-
-
-
-
-
 
 
     static async getUserPrograms(userId: string, companyCode: string): Promise<ProgramWithDetails[]> {

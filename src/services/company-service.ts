@@ -1,5 +1,6 @@
 import {Company} from "@/types/user";
 import {isSupabaseConfigured, supabase} from "@/lib/supabase";
+import utilsUrl from "@/utils/utilsUrl";
 
 export class CompanyService {
 
@@ -7,7 +8,7 @@ export class CompanyService {
     static async getCompanies(type: string): Promise<Company[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/company/${type}`,
+                `${utilsUrl.REST_API_URL}/company/${type}`,
                 {
                     method: "GET",
                     headers: {
@@ -33,7 +34,7 @@ export class CompanyService {
     static async getCompanies_code(company_code: string): Promise<Company[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/company/select`,
+                `${utilsUrl.REST_API_URL}/company/select`,
                 {
                     method: "POST",
                     headers: {
@@ -60,7 +61,7 @@ export class CompanyService {
     static async getCompanies_idx(company_id: string): Promise<Company[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/company/select`,
+                `${utilsUrl.REST_API_URL}/company/select`,
                 {
                     method: "POST",
                     headers: {

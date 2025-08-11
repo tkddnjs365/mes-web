@@ -1,12 +1,13 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {CommonCode, Item, ItemInsertData} from "@/types/data-sql";
+import utilsUrl from "@/utils/utilsUrl";
 
 export class DataSql {
     /* 공통데이터 조회 */
     static async get_comm_code(companyIdx: string, group_id: string): Promise<CommonCode[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/select`,
+                `${utilsUrl.REST_API_URL}/common/select`,
                 {
                     method: "POST",
                     headers: {
@@ -36,7 +37,7 @@ export class DataSql {
     static async get_item_list(companyIdx: string, item: string, item_idx?: string, item_type?: string, item_yn?: string): Promise<Item[]> {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/item/itemSelect`,
+                `${utilsUrl.REST_API_URL}/item/itemSelect`,
                 {
                     method: "POST",
                     headers: {
@@ -96,7 +97,7 @@ export class DataSql {
             const item = save_data[0];
 
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/item/itemSave`,
+                `${utilsUrl.REST_API_URL}/item/itemSave`,
                 {
                     method: "POST",
                     headers: {
