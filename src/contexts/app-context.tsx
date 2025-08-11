@@ -83,19 +83,12 @@ export function AppProvider({children}: { children: ReactNode }) {
                 const superUser = await SuperUserService.loginSuperUser(userId, password)
 
                 if (superUser) {
-                    setCurrentSuperUser(superUser)
-                    saveAuthToken(superUser as User) // SuperUser를 User 타입으로 캐스팅
-                    return true
-                }
-            } else if (userId === "super00_mar") {
-                const superUser = await SuperUserService.loginSuperUser(userId, password)
-
-                if (superUser) {
-                    setCurrentSuperUser(superUser)
+                    setCurrentSuperUser(superUser as SuperUser)
                     saveAuthToken(superUser as User) // SuperUser를 User 타입으로 캐스팅
                     return true
                 }
             }
+
             return false
         } catch (error) {
             console.error("슈퍼유저 로그인 오류:", error)
