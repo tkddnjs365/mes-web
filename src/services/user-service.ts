@@ -38,8 +38,6 @@ export class UserService {
             }
 
             const data: LoginResponse = await res.json();
-            console.log("로그인 성공:", data);
-            console.log("data.user:", data.user);
 
             return data.user;
         } catch (err) {
