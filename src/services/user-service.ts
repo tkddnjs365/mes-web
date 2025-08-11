@@ -64,7 +64,6 @@ export class UserService {
         }
     }
 
-
     static async getUserPrograms(userId: string, companyCode: string): Promise<ProgramWithDetails[]> {
         try {
             if (!isSupabaseConfigured || !supabase) {
