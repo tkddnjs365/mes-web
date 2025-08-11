@@ -33,10 +33,10 @@ export default function UserMng() {
 
                 const grouped = permissions.reduce(
                     (acc, permission) => {
-                        if (!acc[permission.menu_name]) {
-                            acc[permission.menu_name] = [];
+                        if (!acc[permission.menuName]) {
+                            acc[permission.menuName] = [];
                         }
-                        acc[permission.menu_name].push(permission);
+                        acc[permission.menuName].push(permission);
                         return acc;
                     },
                     {} as Record<string, typeof permissions>
