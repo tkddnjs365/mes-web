@@ -14,7 +14,7 @@ export interface User {
 /* super_users ( 슈퍼관리자 정보 )  */
 export interface SuperUser {
   id: string
-  userid: string
+  userId: string
   name: string
   permissions: string[]
   role: "super"
@@ -35,7 +35,7 @@ export interface Company_Admin {
   userIdx: string
   companyIdx: string
   name: string
-  userid: string
+  userId: string
   createdAt: string
   companyCode: string
 }
