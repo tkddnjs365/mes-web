@@ -322,7 +322,7 @@ export default function SuperuserCompanyMng() {
                                                             <div>
                                                                 <div className="font-semibold">{admin.name}</div>
                                                                 <div
-                                                                    className="text-sm text-gray-600">ID: {admin.userId}</div>
+                                                                    className="text-sm text-gray-600">ID: {admin.userid}</div>
                                                                 <div className="text-xs text-gray-500">
                                                                     등록일: {new Date(admin.createdAt).toLocaleDateString("ko-KR")}
                                                                 </div>
