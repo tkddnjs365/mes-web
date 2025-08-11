@@ -121,7 +121,7 @@ export default function Login() {
                             {isLoading ? "로그인 중..." : "로그인"}
                         </button>
                     </form>
-
+                    {/*
                     <div className="mt-4">
                         <button onClick={() => setIsSignupOpen(true)}
                                 className={"w-full px-4 py-4 rounded-md font-medium transition-all cursor-pointer border border-gray-300 min-h-[44px] flex items-center justify-center bg-transparent hover:bg-gray-50"}
@@ -129,7 +129,7 @@ export default function Login() {
                             회원가입
                         </button>
                     </div>
-
+                    */}
                     <div className="mt-4 text-center text-sm text-gray-600">
                         <p>테스트 계정:</p>
                         <p>ID : admin, PW : admin</p>
