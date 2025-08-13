@@ -1,7 +1,7 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import type {PendingUser, User} from "@/types/user"
 import type {ProgramWithDetails} from "@/types/program"
-import {CompanyService} from "@/services/company-service";
+import {CompaniesService} from "@/services/companies-service";
 import bcrypt from "bcryptjs";
 import {ProgramService} from "@/services/program-service";
 import utilsUrl from "@/utils/utilsUrl";
@@ -196,7 +196,7 @@ export class UserService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_idx(companyIdx)
+            const comp_data = await CompaniesService.getCompanies_idx(companyIdx)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return []
@@ -277,7 +277,7 @@ export class UserService {
             if (fetchError || !pendingUser) return false
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_code(pendingUser.company_code)
+            const comp_data = await CompaniesService.getCompanies_code(pendingUser.company_code)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;

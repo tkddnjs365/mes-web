@@ -7,7 +7,7 @@ interface LabelTextProps {
     placeholder?: string;
     disabled?: boolean;
     inputWidth?: string;
-    type?: "text" | "textarea"; // 명확한 타입 지정
+    type?: "text" | "textarea" | "numeric"; // 명확한 타입 지정
     isError?: boolean;
 }
 
@@ -31,7 +31,7 @@ export const FormLabelText: React.FC<LabelTextProps> = ({
 
     return (
         <div className={`flex items-center space-x-2 text-center`}>
-            <label className="text-sm font-medium text-gray-700 min-w-[70px] text-right">
+            <label className="text-sm font-medium text-gray-700 min-w-[100px] text-right">
                 {label}
                 {isError && <span className="text-red-600 ml-1">*</span>}
             </label>
@@ -42,56 +42,83 @@ export const FormLabelText: React.FC<LabelTextProps> = ({
                     value={value}
                     onChange={(e) => onChange(e.currentTarget.value)}
                     className={`${inputWidth || "flex-1"}
-                                 min-h-[30px] 
-                                 border-2
-                                 ${errorClass}
-                                 ${disabledClass}
-                                 rounded-md 
-                                 px-3 
-                                 py-1.5 
-                                 text-sm 
-                                 font-medium
-                                 shadow-sm 
-                                 transition-all 
-                                 duration-200
-                                 focus:outline-none 
-                                 focus:ring-2 
-                                 focus:ring-offset-1
-                                 hover:border-gray-500
-                                `}
+                min-h-[30px] 
+                border-2
+                ${errorClass}
+                ${disabledClass}
+                rounded-md 
+                px-3 
+                py-1.5 
+                text-sm 
+                font-medium
+                shadow-sm 
+                transition-all 
+                duration-200
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-offset-1
+                hover:border-gray-500
+              `}
                     placeholder={placeholder}
                     disabled={disabled}
                     required
                 />
-            ) : (
+            ) : type === "textarea" ? (
                 <textarea
                     value={value}
                     onChange={(e) => onChange(e.currentTarget.value)}
                     className={`${inputWidth || "flex-1"}
-                                min-h-[100px] 
-                                border-2
-                                bg-white 
-                                ${errorClass}
-                                ${disabledClass}
-                                rounded-md 
-                                px-3 
-                                py-1.5 
-                                text-sm 
-                                font-medium
-                                shadow-sm 
-                                resize-none
-                                transition-all 
-                                duration-200
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-offset-1
-                                hover:border-gray-500
-                                leading-5
-                                `}
+                min-h-[100px] 
+                border-2
+                bg-white 
+                ${errorClass}
+                ${disabledClass}
+                rounded-md 
+                px-3 
+                py-1.5 
+                text-sm 
+                font-medium
+                shadow-sm 
+                resize-none
+                transition-all 
+                duration-200
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-offset-1
+                hover:border-gray-500
+                leading-5
+              `}
                     placeholder={placeholder}
                     disabled={disabled}
                 />
-            )}
+            ) : type === "numeric" ? (
+                <input
+                    type="number"
+                    value={value}
+                    onChange={(e) => onChange(e.currentTarget.value)}
+                    className={`${inputWidth || "flex-1"}
+                min-h-[30px] 
+                border-2
+                ${errorClass}
+                ${disabledClass}
+                rounded-md 
+                px-3 
+                py-1.5 
+                text-sm 
+                font-medium
+                shadow-sm 
+                transition-all 
+                duration-200
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-offset-1
+                hover:border-gray-500
+              `}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    required
+                />
+            ) : null}
         </div>
     );
 };

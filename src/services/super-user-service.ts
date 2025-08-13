@@ -1,6 +1,6 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
 import {Company_Admin, SuperUser, type User} from "@/types/user"
-import {CompanyService} from "@/services/company-service";
+import {CompaniesService} from "@/services/companies-service";
 import bcrypt from "bcryptjs";
 import utilsUrl from "@/utils/utilsUrl";
 
@@ -216,7 +216,7 @@ export class SuperUserService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_code(adminData.companyCode)
+            const comp_data = await CompaniesService.getCompanies_code(adminData.companyCode)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;

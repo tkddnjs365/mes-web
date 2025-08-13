@@ -32,3 +32,11 @@ npm install -D @types/node
 # MariaDb
 # User : root
 # PW : mes_admin00!
+
+
+
+
+### 기타 ###
+vercel.json
+ =>vercel에는 일반 http가 안되서 REST API 통신이 안됨
+   그래서 Vercel 프록시(vercel.json) 사용

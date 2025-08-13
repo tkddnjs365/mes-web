@@ -29,7 +29,7 @@ export const FormLabelSelect: React.FC<LabelSelectProps> = ({
 
     return (
         <div className={`flex items-center space-x-2 text-center`}>
-            <label className="text-sm font-medium text-gray-700 min-w-[70px] text-right">
+            <label className="text-sm font-medium text-gray-700 min-w-[100px] text-right">
                 {label}
                 {isError && <span className="text-red-600 ml-1">*</span>}
             </label>

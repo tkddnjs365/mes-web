@@ -1,5 +1,5 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import {CommonCode, Item, ItemInsertData} from "@/types/data-sql";
+import {CommonCode, CommonGroupData, Company, Item, ItemInsertData} from "@/types/data-sql";
 import utilsUrl from "@/utils/utilsUrl";
 
 export class DataSql {
@@ -30,6 +30,129 @@ export class DataSql {
         } catch (err) {
             console.error("API 호출 오류:", err);
             return [];
+        }
+    }
+
+    /* 공통데이터 그룹별 데이터 조회 */
+    static async get_comm_code_dtl(companyIdx: string, groupId: string): Promise<CommonGroupData[]> {
+        try {
+            const res = await fetch(
+                `${utilsUrl.REST_API_URL}/common/groupDtlSelect`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({groupId: groupId, companyIdx: companyIdx}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("실패:", res.statusText);
+                return [];
+            }
+
+            const data = await res.json();
+            return data.common.map((val: {dataId: string; groupId: string; value: string; useYn: number; sortOrder: number; keyId: string}) => ({
+                dataId: val.dataId,
+                groupId: val.groupId,
+                value: val.value,
+                useYn: val.useYn,
+                sortOrder: val.sortOrder,
+                keyId: val.keyId,
+            }));
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return [];
+        }
+    }
+
+    /* 공통데이터 저장 */
+    static async set_comm_code(companyIdx: string, groupId: string, value: string, sortOrder: number, useYn: string, keyId: string): Promise<boolean> {
+        try {
+            const res = await fetch(
+                `${utilsUrl.REST_API_URL}/common/insertCommon`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        companyIdx: companyIdx || "",
+                        groupId: groupId || "",
+                        value: value || "",
+                        sortOrder: sortOrder || "",
+                        useYn: useYn || "",
+                        keyId: keyId || "",
+                    }),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("set_comm_code 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+
+        } catch (error) {
+            console.error("저장 오류:", error);
+            return false;
+        }
+    }
+
+    /* 공통데이터 수정 */
+    static async update_comm_code(companyIdx: string, dataId: string, value: string, sortOrder: number, useYn: string): Promise<boolean> {
+        try {
+            const res = await fetch(
+                `${utilsUrl.REST_API_URL}/common/updateCommon`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        companyIdx: companyIdx || "",
+                        dataId: dataId || "",
+                        value: value || "",
+                        sortOrder: sortOrder || "",
+                        useYn: useYn || "",
+                    }),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("update_comm_code 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("오류:", error)
+            return false
+        }
+    }
+
+    /* 공통데이터 삭제 */
+    static async del_comm_code(companyIdx: string, dataId: string): Promise<boolean> {
+        try {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/common/deleteCommon`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({companyIdx, dataId}),
+            });
+
+            if (!res.ok) {
+                console.error("del_comm_code 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("오류:", error)
+            return false
         }
     }
 
@@ -82,6 +205,108 @@ export class DataSql {
 
     /* 품목 저장 */
     static async set_item_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
+        success: boolean;
+        error?: string;
+        item_idx?: string
+    }> {
+        try {
+            if (!save_data || save_data.length === 0) {
+                return {
+                    success: false,
+                    error: '저장할 데이터가 없습니다.'
+                };
+            }
+
+            const item = save_data[0];
+
+            const res = await fetch(
+                `${utilsUrl.REST_API_URL}/item/itemSave`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        curItemIdx: cur_item_idx || "",
+                        companyIdx: item.companyIdx,
+                        itemCd: item.item_cd,
+                        itemNm: item.item_nm,
+                        itemSpec: item.item_spec,
+                        itemType: item.item_type,
+                        itemUnit: item.item_unit,
+                        useYn: item.use_yn,
+                        etc: item.etc
+                    }),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("API 요청 실패:", res.statusText);
+                return {
+                    success: false,
+                    error: `API 요청 실패: ${res.statusText}`
+                };
+            }
+
+            const data: {
+                success: boolean;
+                error?: string;
+                itemIdx?: string;
+            } = await res.json();
+
+            if (data.success) {
+                return {
+                    success: true,
+                    item_idx: data.itemIdx
+                };
+            } else {
+                return {
+                    success: false,
+                    error: data.error || '저장 실패'
+                };
+            }
+
+        } catch (error) {
+            console.error("품목 저장 오류:", error);
+            return {
+                success: false,
+                error: '저장 실패'
+            };
+        }
+    }
+
+    /* 거래선 전체 조회 */
+    static async get_company_list(companyIdx: string, company: string, coIdx?: string, useYn?: string): Promise<Company[]> {
+        try {
+            const res = await fetch(
+                `${utilsUrl.REST_API_URL}/companyMst/companySelect`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({companyIdx, company: company, coIdx: coIdx, useYn: useYn}),
+                }
+            );
+
+            if (!res.ok) {
+                console.error("실패:", res.statusText);
+                return [];
+            }
+
+            const data = await res.json();
+
+            return data.companyList.map((val: Company) => ({
+                ...val
+            }));
+        } catch (err) {
+            console.error("API 호출 오류:", err);
+            return [];
+        }
+    }
+
+    /* 거래선 저장 */
+    static async set_company_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
         success: boolean;
         error?: string;
         item_idx?: string

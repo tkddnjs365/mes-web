@@ -1,6 +1,5 @@
 "use client"
 
-
 import {useEffect, useRef, useState} from "react";
 import {ColDef} from "ag-grid-community";
 import {formatToKoreanDate} from "@/utils/data-format";
@@ -73,11 +72,11 @@ export default function ItemMng() {
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_type');
+            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
 
             // 품목단위 로드
-            const itemUnitData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_unit');
+            const itemUnitData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item_unit');
             setItemUnits([{label: "", value: ""}, ...itemUnitData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);

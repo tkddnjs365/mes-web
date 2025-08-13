@@ -5,8 +5,9 @@ import {useState} from "react";
 import SuperuserCompanyMng from "./superuser-company-mng"
 import SuperuserProgMng from "@/components/superuser-prog-mng";
 import SuperuserMenuMng from "@/components/superuser-menu-mng";
+import SuperUserCommonMng from "@/components/superuser-common-mng";
 
-type SuperMenuItem = "unified-company" | "program" | "menu"
+type SuperMenuItem = "unified-company" | "program" | "menu" | "common"
 
 export default function SuperuserDashboard() {
     const {currentSuperUser, logout} = useAppContext()
@@ -16,6 +17,7 @@ export default function SuperuserDashboard() {
         {id: "unified-company" as SuperMenuItem, name: "회사 관리", description: "회사 등록 및 관리자/프로그램 관리"},
         {id: "program" as SuperMenuItem, name: "프로그램 관리", description: "시스템에서 사용할 프로그램 관리"},
         {id: "menu" as SuperMenuItem, name: "메뉴 관리", description: "네비게이션 메뉴 구조 관리"},
+        {id: "common" as SuperMenuItem, name: "공통코드 관리", description: "회사별 공통코드 관리"},
     ]
 
     const renderContent = () => {
@@ -26,6 +28,8 @@ export default function SuperuserDashboard() {
                 return <SuperuserProgMng/>
             case "menu":
                 return <SuperuserMenuMng/>
+            case "common":
+                return <SuperUserCommonMng/>
             default:
                 return <SuperuserCompanyMng/>
         }

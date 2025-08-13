@@ -5,7 +5,7 @@ import {SuperUserService} from "@/services/super-user-service"
 import {ProgramService} from "@/services/program-service"
 import type {Company, Company_Admin} from "@/types/user"
 import type {CompanyProgram, Program} from "@/types/program"
-import {CompanyService} from "@/services/company-service";
+import {CompaniesService} from "@/services/companies-service";
 
 export default function SuperuserCompanyMng() {
     const [companies, setCompanies] = useState<Company[]>([]) // 회사 목록
@@ -46,7 +46,7 @@ export default function SuperuserCompanyMng() {
     const loadCompanies = async () => {
         setIsLoading(true)
         try {
-            const data = await CompanyService.getCompanies("admin")
+            const data = await CompaniesService.getCompanies("admin")
             setCompanies(data.filter((company) => company.isActive))
         } catch (error) {
             console.error("회사 목록 로드 실패:", error)

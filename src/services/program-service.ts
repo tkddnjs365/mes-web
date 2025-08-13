@@ -8,7 +8,7 @@ import {
     ProgMenu,
     Program
 } from "@/types/program"
-import {CompanyService} from "@/services/company-service";
+import {CompaniesService} from "@/services/companies-service";
 import {DashBoardMain} from "@/components/dashboard-main"
 import utilsUrl from "@/utils/utilsUrl";
 
@@ -17,10 +17,10 @@ const componentMap: Record<string, () => Promise<{ default: React.ComponentType 
     "user-mng": () => import("@/components/pages/user-mng"),
     "item-mng": () => import("@/components/pages/item-mng"),
     "item-mng-list": () => import("@/components/pages/item-mng-list"),
+    "company-mng": () => import("@/components/pages/company-mng"),
 };
 
 export class ProgramService {
-
     /* 프로그램 오픈 */
     static async getProgram_progIdx(prog_path: string): Promise<React.ComponentType | null> {
         try {
@@ -840,7 +840,7 @@ export class ProgramService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_code(companyCode)
+            const comp_data = await CompaniesService.getCompanies_code(companyCode)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;
@@ -867,7 +867,7 @@ export class ProgramService {
             }
 
             // 회사 정보 가져오기
-            const comp_data = await CompanyService.getCompanies_code(companyCode)
+            const comp_data = await CompaniesService.getCompanies_code(companyCode)
             if (!comp_data) {
                 console.error("회사 조회 실패:", comp_data);
                 return false;

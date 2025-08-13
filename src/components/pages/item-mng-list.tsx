@@ -78,7 +78,7 @@ export default function ItemMngList() {
 
         try {
             // 품목구분 로드
-            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item.item_type');
+            const itemTypeData = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.item_type');
             setItemTypes([{label: "", value: ""}, ...itemTypeData]);
         } catch (error) {
             console.error("공통코드 로드 실패:", error);

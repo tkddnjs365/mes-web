@@ -4,6 +4,25 @@ export interface CommonCode {
     value: string;
 }
 
+/* 공통코드_그룹코드 */
+export interface CommonGroupData {
+    dataId: string;
+    groupId: string;
+    value: string;
+    useYn: number;
+    sortOrder: number;
+    keyId: string;
+}
+
+/* 공통코드_그룹별 데이터 */
+export interface CommonGroupDtlData {
+    dataId: string;
+    groupId: string;
+    value: string;
+    useYn: number;
+    sortOrder: number;
+}
+
 /* 품목 조회용 */
 export interface Item {
     companyIdx: string;
@@ -31,4 +50,32 @@ export interface ItemInsertData {
   item_unit: string;
   use_yn: string;
   etc: string | null;
+}
+
+/* 거래처 조회용 */
+export interface Company {
+  coIdx: string;
+  coCd: string;
+  coNm: string;
+  useYn: string;
+  compAddr: string;
+  compType: string;
+  compItem: string;
+  compCurr: string;
+  bizNo: string;
+  ceoNm: string;
+  tel: string;
+  fax: string;
+  email: string;
+  country: string;
+  createdAt: string;
+  createdUser: string;
+  updatedAt: string;
+  updatedUser: string;
+
+  compTypeIdx: string;
+  compItemIdx: string;
+  compCurrIdx: string;
+  createdUserIdx: string;
+  updatedUserIdx: string;
 }
