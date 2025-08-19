@@ -1,5 +1,5 @@
 import {isSupabaseConfigured, supabase} from "@/lib/supabase"
-import {CommonCode, CommonGroupData, Company, Item, ItemInsertData} from "@/types/data-sql";
+import {CommonCode, CommonGroupData, Company, CompanyInsertData, Item, ItemInsertData} from "@/types/data-sql";
 import utilsUrl from "@/utils/utilsUrl";
 
 export class DataSql {
@@ -53,7 +53,14 @@ export class DataSql {
             }
 
             const data = await res.json();
-            return data.common.map((val: {dataId: string; groupId: string; value: string; useYn: number; sortOrder: number; keyId: string}) => ({
+            return data.common.map((val: {
+                dataId: string;
+                groupId: string;
+                value: string;
+                useYn: number;
+                sortOrder: number;
+                keyId: string
+            }) => ({
                 dataId: val.dataId,
                 groupId: val.groupId,
                 value: val.value,
@@ -297,7 +304,8 @@ export class DataSql {
             const data = await res.json();
 
             return data.companyList.map((val: Company) => ({
-                ...val
+                ...val,
+                coType: val.coType || [] // 배열로 초기화
             }));
         } catch (err) {
             console.error("API 호출 오류:", err);
@@ -306,10 +314,10 @@ export class DataSql {
     }
 
     /* 거래선 저장 */
-    static async set_company_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
+    static async set_company_list(cur_idx: string, save_data: CompanyInsertData[]): Promise<{
         success: boolean;
         error?: string;
-        item_idx?: string
+        company_idx?: string
     }> {
         try {
             if (!save_data || save_data.length === 0) {
@@ -319,25 +327,36 @@ export class DataSql {
                 };
             }
 
-            const item = save_data[0];
+            const saveData = save_data[0];
 
             const res = await fetch(
-                `${utilsUrl.REST_API_URL}/item/itemSave`,
+                `${utilsUrl.REST_API_URL}/companyMst/companySave`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        curItemIdx: cur_item_idx || "",
-                        companyIdx: item.companyIdx,
-                        itemCd: item.item_cd,
-                        itemNm: item.item_nm,
-                        itemSpec: item.item_spec,
-                        itemType: item.item_type,
-                        itemUnit: item.item_unit,
-                        useYn: item.use_yn,
-                        etc: item.etc
+                        curCoIdx: cur_idx || "",
+                        companyIdx: saveData.companyIdx,
+
+                        coCd: saveData.coCd,
+                        coNm: saveData.coNm,
+                        useYn: saveData.useYn,
+                        compAddr: saveData.compAddr,
+                        compType: saveData.compType,
+                        compItem: saveData.compItem,
+                        compCurr: saveData.compCurr,
+
+                        bizNo: saveData.bizNo,
+                        ceoNm: saveData.ceoNm,
+                        tel: saveData.tel,
+                        fax: saveData.fax,
+                        email: saveData.email,
+                        country: saveData.country,
+                        userIdx: saveData.userIdx,
+
+                    coType: saveData.coType || [],
                     }),
                 }
             );
@@ -351,15 +370,15 @@ export class DataSql {
             }
 
             const data: {
+                coIdx: string;
                 success: boolean;
                 error?: string;
-                itemIdx?: string;
             } = await res.json();
 
             if (data.success) {
                 return {
                     success: true,
-                    item_idx: data.itemIdx
+                    company_idx: data.coIdx
                 };
             } else {
                 return {
@@ -369,7 +388,7 @@ export class DataSql {
             }
 
         } catch (error) {
-            console.error("품목 저장 오류:", error);
+            console.error("저장 오류:", error);
             return {
                 success: false,
                 error: '저장 실패'

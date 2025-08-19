@@ -1,14 +1,15 @@
 "use client"
 
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {ColDef} from "ag-grid-community";
 import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapper";
 import {DataSql} from "@/services/data-sql";
-import {CommonCode, Company} from "@/types/data-sql";
+import {CommonCode, Company, CompanyInsertData} from "@/types/data-sql";
 import {useAppContext} from "@/contexts/app-context";
 import {CommonToolbar} from "@/components/common/common-toolbar";
 import {FormLabelText} from "@/components/ui/form-label-text"
 import {FormLabelSelect} from "@/components/ui/form-label-select";
+import {validateRequiredFields} from "@/utils/validation";
 
 const USE_YN_OPTIONS = [
     {label: "Yes", value: "Y"},
@@ -19,7 +20,7 @@ const USE_YN_OPTIONS = [
 const INITIAL_SAVE_CONDITION = {
     coCd: '',
     coNm: '',
-    useYn: '',
+    useYn: 'Y',
     compAddr: '',
     compType: '',
     compItem: '',
@@ -30,6 +31,7 @@ const INITIAL_SAVE_CONDITION = {
     fax: '',
     email: '',
     country: '',
+    coType: [] as string[],
 };
 
 export default function CompanyMng() {
@@ -42,13 +44,38 @@ export default function CompanyMng() {
     const [invalidFields, setInvalidFields] = useState<string[]>([]); // 저장 오류상태 Chk 관리
     const [curr, setCurr] = useState<CommonCode[]>([{label: "", value: ""}])
     const [country, setCountry] = useState<CommonCode[]>([{label: "", value: ""}])
+    const [coType, setCoType] = useState<CommonCode[]>([{label: "", value: ""}])
 
-    const [columnDefs] = useState<ColDef[]>([
-        {headerName: "co_idx", field: "co_idx", width: 50, hide: true,},
-        {headerName: "거래처코드", field: "co_cd", width: 200, cellClass: "ag-text-center-cell",},
-        {headerName: "거래처명", field: "co_nm", width: 300},
-        {headerName: "거래처유형", field: "co_type", width: 200, cellClass: "ag-text-center-cell",},
-    ]);
+    // 거래처유형 변환 함수
+    const getCoTypeLabels = useCallback((values: string[] | null | undefined): string => {
+        if (!values || !Array.isArray(values)) return '';
+
+        const labels = values.map(value => {
+            const foundItem = coType.find(item => item.value === value);
+            return foundItem ? foundItem.label : value;
+        });
+        return labels.join(', ');
+    }, [coType]);
+
+    const columnDefs = useMemo<ColDef[]>(() => [
+        {headerName: "co_idx", field: "coIdx", width: 50, hide: true,},
+        {headerName: "거래처코드", field: "coCd", width: 200, cellClass: "ag-text-center-cell",},
+        {headerName: "거래처명", field: "coNm", width: 250},
+        {
+            headerName: "거래처유형",
+            field: "coType",
+            width: 150,
+            cellRenderer: (params: { value: string[] | null | undefined }) => {
+                return getCoTypeLabels(params.value);
+            }
+        },
+        {
+            headerName: "사용여부",
+            field: "useYn",
+            width: 110,
+            cellStyle: {display: "flex", justifyContent: "center", alignItems: "center"},
+        },
+    ], [getCoTypeLabels]);
 
     const gridRef = useRef<AgGridWrapperRef>(null);
 
@@ -71,6 +98,10 @@ export default function CompanyMng() {
         //국가
         com_data = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.country');
         setCountry([{label: "", value: ""}, ...com_data]);
+
+        //거래처유형
+        com_data = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.co_type');
+        setCoType([...com_data]);
         try {
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
@@ -133,6 +164,7 @@ export default function CompanyMng() {
                     fax: detailData.fax || '',
                     email: detailData.email || '',
                     country: detailData.country || '',
+                    coType: detailData.coType || [],
                 });
             }
         } catch (error) {
@@ -178,13 +210,11 @@ export default function CompanyMng() {
     //저장
     const handleSave = async () => {
         // 필수 필드 검증
-        /*
+
         const requiredFields = [
-            {field: saveCondition.item_cd, name: "품목코드", key: "item_cd"},
-            {field: saveCondition.item_nm, name: "품목명", key: "item_nm"},
-            {field: saveCondition.item_type, name: "품목구분", key: "item_type"},
-            {field: saveCondition.item_spec, name: "품목규격", key: "item_spec"},
-            {field: saveCondition.item_unit, name: "품목단위", key: "item_unit"},
+            {field: saveCondition.coCd, name: "거래처코드", key: "coCd"},
+            {field: saveCondition.coNm, name: "거래처명", key: "coNm"},
+            {field: saveCondition.coType, name: "거래처유형", key: "coType"},
         ];
         const validation = validateRequiredFields(requiredFields);
         if (!validation.isValid) {
@@ -200,21 +230,30 @@ export default function CompanyMng() {
             return;
         }
 
-        const itemData: ItemInsertData = {
+        const companyData: CompanyInsertData = {
             companyIdx: currentUser.companyIdx,
-            item_cd: saveCondition.item_cd,
-            item_nm: saveCondition.item_nm,
-            item_type: saveCondition.item_type,
-            item_spec: saveCondition.item_spec,
-            item_unit: saveCondition.item_unit,
-            use_yn: saveCondition.item_yn,
-            etc: saveCondition.etc,
+            coCd: saveCondition.coCd,
+            coNm: saveCondition.coNm,
+            useYn: saveCondition.useYn,
+            compAddr: saveCondition.compAddr,
+            compType: saveCondition.compType,
+            compItem: saveCondition.compItem,
+            compCurr: saveCondition.compCurr,
+
+            bizNo: saveCondition.bizNo,
+            ceoNm: saveCondition.ceoNm,
+            tel: saveCondition.tel,
+            fax: saveCondition.fax,
+            email: saveCondition.email,
+            country: saveCondition.country,
+            userIdx: currentUser?.id,
+
+            coType: saveCondition.coType,
         };
 
-        const result = await DataSql.set_item_list(selectIdx, [itemData]);
+        const result = await DataSql.set_company_list(selectIdx, [companyData]);
         if (result.success) {
             alert("저장되었습니다.");
-            console.log('저장 성공, item_idx:', result.item_idx);
             await loadItemList();
 
             setSaveCondition(INITIAL_SAVE_CONDITION)
@@ -224,8 +263,8 @@ export default function CompanyMng() {
             alert("저장에 실패했습니다.");
             console.error('저장 실패:', result.error);
         }
-         */
     }
+
     //엑셀
     const handleExcel = () => {
         if (gridRef.current) {
@@ -406,6 +445,42 @@ export default function CompanyMng() {
 
                             {/* 세 번째 줄 */}
                             <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                                <FormLabelSelect
+                                    label="거래처유형"
+                                    value={saveCondition.coType}
+                                    onChange={(val) => {
+                                        // val은 string | string[] 타입이므로 타입 체크 필요
+                                        const newCoType = Array.isArray(val) ? val : [val];
+                                        setSaveCondition({...saveCondition, coType: newCoType});
+
+                                        // 유효성 검사 - 배열이 비어있지 않은지 확인
+                                        if (invalidFields.includes("coType") && newCoType.length > 0) {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "coType"));
+                                        }
+                                    }}
+                                    options={coType}
+                                    disabled={isLoading}
+                                    isError={invalidFields.includes("coType")}
+                                    type={"multi"}
+                                />
+                                <FormLabelSelect
+                                    label="화폐"
+                                    value={saveCondition.compCurr}
+                                    onChange={(val) => {
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, compCurr: value});
+                                        if (invalidFields.includes("compCurr") && value.trim() !== "") {
+                                            setInvalidFields(invalidFields.filter((key) => key !== "compCurr"));
+                                        }
+                                    }}
+                                    options={curr}
+                                    disabled={isLoading}
+                                    isError={invalidFields.includes("compCurr")}
+                                />
+                            </div>
+
+                            {/* 네 번째 줄 */}
+                            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
                                 <FormLabelText
                                     label="사업형태"
                                     value={saveCondition.compType}
@@ -433,32 +508,6 @@ export default function CompanyMng() {
                                     disabled={isLoading}
                                     inputWidth="w-full"
                                     isError={invalidFields.includes("compItem")}
-                                />
-                            </div>
-
-                            {/* 네 번째 줄 */}
-                            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                                <FormLabelSelect
-                                    label="화폐"
-                                    value={saveCondition.compCurr}
-                                    onChange={(val) => {
-                                        setSaveCondition({...saveCondition, compCurr: val});
-                                        if (invalidFields.includes("compCurr") && val.trim() !== "") {
-                                            setInvalidFields(invalidFields.filter((key) => key !== "compCurr"));
-                                        }
-                                    }}
-                                    options={curr}
-                                    disabled={isLoading}
-                                    isError={invalidFields.includes("compCurr")}
-                                />
-                                <FormLabelSelect
-                                    label="사용여부"
-                                    value={saveCondition.useYn}
-                                    onChange={(val) => {
-                                        setSaveCondition({...saveCondition, useYn: val});
-                                    }}
-                                    options={USE_YN_OPTIONS}
-                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -549,14 +598,29 @@ export default function CompanyMng() {
                                     label="국가"
                                     value={saveCondition.country}
                                     onChange={(val) => {
-                                        setSaveCondition({...saveCondition, country: val});
-                                        if (invalidFields.includes("country") && val.trim() !== "") {
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, country: value});
+                                        if (invalidFields.includes("country") && value.trim() !== "") {
                                             setInvalidFields(invalidFields.filter((key) => key !== "country"));
                                         }
                                     }}
                                     options={country}
                                     disabled={isLoading}
                                     isError={invalidFields.includes("country")}
+                                />
+                            </div>
+
+                            {/* 여덟 번째 줄*/}
+                            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                                <FormLabelSelect
+                                    label="사용여부"
+                                    value={saveCondition.useYn}
+                                    onChange={(val) => {
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, useYn: value});
+                                    }}
+                                    options={USE_YN_OPTIONS}
+                                    disabled={isLoading}
                                 />
                             </div>
                         </div>

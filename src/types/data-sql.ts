@@ -42,40 +42,61 @@ export interface Item {
 
 /* 품목 저장 용 */
 export interface ItemInsertData {
-  companyIdx: string;
-  item_cd: string;
-  item_nm: string;
-  item_spec: string | null;
-  item_type: string;
-  item_unit: string;
-  use_yn: string;
-  etc: string | null;
+    companyIdx: string;
+    item_cd: string;
+    item_nm: string;
+    item_spec: string | null;
+    item_type: string;
+    item_unit: string;
+    use_yn: string;
+    etc: string | null;
 }
 
 /* 거래처 조회용 */
 export interface Company {
-  coIdx: string;
-  coCd: string;
-  coNm: string;
-  useYn: string;
-  compAddr: string;
-  compType: string;
-  compItem: string;
-  compCurr: string;
-  bizNo: string;
-  ceoNm: string;
-  tel: string;
-  fax: string;
-  email: string;
-  country: string;
-  createdAt: string;
-  createdUser: string;
-  updatedAt: string;
-  updatedUser: string;
+    coIdx: string;
+    coCd: string;
+    coNm: string;
+    useYn: string;
+    compAddr: string;
+    compType: string;
+    compItem: string;
+    compCurr: string;
+    bizNo: string;
+    ceoNm: string;
+    tel: string;
+    fax: string;
+    email: string;
+    country: string;
+    createdAt: string;
+    createdUser: string;
+    updatedAt: string;
+    updatedUser: string;
 
-  compTypeIdx: string;
-  compItemIdx: string;
-  compCurrIdx: string;
-  createdUserIdx: string;
-  updatedUserIdx: string;
+    compCurrIdx: string;
+    createdUserIdx: string;
+    updatedUserIdx: string
+
+    coType: string[];
+}
+
+/* 거래처 저장용 */
+export interface CompanyInsertData {
+    companyIdx: string;
+
+    coCd: string;
+    coNm: string;
+    useYn: string;
+    compAddr: string;
+    compType: string;
+    compItem: string;
+    compCurr: string;
+    bizNo: string;
+    ceoNm: string;
+    tel: string;
+    fax: string;
+    email: string;
+    country: string;
+    userIdx: string;
+    coType: string[];
 }

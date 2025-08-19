@@ -1,5 +1,5 @@
 export interface RequiredField {
-    field: string;
+    field: string | string[];
     name: string;
     key: string; // 필드 식별용
 }
@@ -16,7 +16,17 @@ export const validateRequiredFields = (
     const invalidKeys: string[] = [];
 
     for (const {field, key} of fields) {
-        if (!field || field.trim() === "") {
+        let isEmpty = false;
+
+        if (Array.isArray(field)) {
+            // 배열인 경우 빈 배열이거나 길이가 0이면 invalid
+            isEmpty = field.length === 0;
+        } else {
+            // 문자열인 경우 빈 문자열이거나 공백만 있으면 invalid
+            isEmpty = !field || field.trim() === "";
+        }
+
+        if (isEmpty) {
             invalidKeys.push(key);
         }
     }
