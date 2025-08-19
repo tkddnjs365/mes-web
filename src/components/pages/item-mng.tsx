@@ -109,6 +109,7 @@ export default function ItemMng() {
             setSaveCondition(INITIAL_SAVE_CONDITION)
             setSelectItemIdx("")
             setSelectItemIdx(selectedItem.item_idx)
+            setInvalidFields([]);
             await loadItemDetail(selectedItem.item_idx);
         }
     }
