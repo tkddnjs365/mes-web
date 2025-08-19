@@ -400,8 +400,9 @@ export default function ItemMng() {
                                     label="품목구분"
                                     value={saveCondition.item_type}
                                     onChange={(val) => {
-                                        setSaveCondition({...saveCondition, item_type: val});
-                                        if (invalidFields.includes("item_type") && val.trim() !== "") {
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, item_type: value});
+                                        if (invalidFields.includes("item_type") && value.trim() !== "") {
                                             setInvalidFields(invalidFields.filter((key) => key !== "item_type"));
                                         }
                                     }}
@@ -414,8 +415,9 @@ export default function ItemMng() {
                                     label="품목단위"
                                     value={saveCondition.item_unit}
                                     onChange={(val) => {
-                                        setSaveCondition({...saveCondition, item_unit: val});
-                                        if (invalidFields.includes("item_unit") && val.trim() !== "") {
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, item_unit: value});
+                                        if (invalidFields.includes("item_unit") && value.trim() !== "") {
                                             setInvalidFields(invalidFields.filter((key) => key !== "item_unit"));
                                         }
                                     }}
@@ -428,7 +430,8 @@ export default function ItemMng() {
                                     label="사용여부"
                                     value={saveCondition.item_yn}
                                     onChange={(val) => {
-                                        setSaveCondition({...saveCondition, item_yn: val});
+                                        const value = val as string;
+                                        setSaveCondition({...saveCondition, item_yn: value});
                                     }}
                                     options={USE_YN_OPTIONS}
                                     disabled={isLoading}

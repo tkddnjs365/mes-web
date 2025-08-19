@@ -91,17 +91,15 @@ export default function CompanyMng() {
         if (!currentUser?.companyIdx) return;
         let com_data;
 
-        //화폐
-        com_data = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.curr');
-        setCurr([{label: "", value: ""}, ...com_data]);
-
-        //국가
-        com_data = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.country');
-        setCountry([{label: "", value: ""}, ...com_data]);
-
-        //거래처유형
-        com_data = await DataSql.get_comm_code(currentUser.companyIdx, 'sys.co_type');
-        setCoType([...com_data]);
+            const [currData, countryData, coTypeData] = await Promise.all([
+                DataSql.get_comm_code(currentUser.companyIdx, 'sys.curr'),
+                DataSql.get_comm_code(currentUser.companyIdx, 'sys.country'),
+                DataSql.get_comm_code(currentUser.companyIdx, 'sys.co_type')
+            ]);
+            
+            setCurr([{ label: "", value: "" }, ...currData]); //화폐
+            setCountry([{ label: "", value: "" }, ...countryData]); //국가
+            setCoType(coTypeData); //거래처유형
         try {
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
