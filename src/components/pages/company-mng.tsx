@@ -89,7 +89,6 @@ export default function CompanyMng() {
     /* 공통코드 로드 */
     const loadCommonCodes = async () => {
         if (!currentUser?.companyIdx) return;
-        let com_data;
 
             const [currData, countryData, coTypeData] = await Promise.all([
                 DataSql.get_comm_code(currentUser.companyIdx, 'sys.curr'),

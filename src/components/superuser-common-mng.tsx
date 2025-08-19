@@ -406,7 +406,10 @@ export default function SuperuserCompanyMng() {
                             <FormLabelSelect
                                 label="사용여부"
                                 value={saveCondition.useYn}
-                                onChange={(val) => setSaveCondition(prev => ({...prev, useYn: val}))}
+                                onChange={(val) => {
+                                    const value = val as string;
+                                    setSaveCondition(prev => ({...prev, useYn: value}))
+                                }}
                                 options={USE_YN_OPTIONS}
                                 disabled={isLoading}
                             />
