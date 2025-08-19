@@ -98,7 +98,7 @@ export default function CompanyMng() {
             
             setCurr([{ label: "", value: "" }, ...currData]); //화폐
             setCountry([{ label: "", value: "" }, ...countryData]); //국가
-            setCoType(coTypeData); //거래처유형
+            setCoType([...coTypeData]); //거래처유형
         try {
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
