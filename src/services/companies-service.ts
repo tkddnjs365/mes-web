@@ -23,7 +23,7 @@ export class CompaniesService {
             }
 
             const data = await res.json();
-            return data.companies || [];
+            return data.data || [];
         } catch (error) {
             console.error("회사 목록 조회 오류:", error)
             return []
@@ -50,7 +50,7 @@ export class CompaniesService {
             }
 
             const data = await res.json();
-            return data.companies || [];
+            return data.data || [];
         } catch (error) {
             console.error("회사 목록 조회 오류:", error)
             return []
@@ -77,7 +77,7 @@ export class CompaniesService {
             }
 
             const data = await res.json();
-            return data.companies || [];
+            return data.data || [];
         } catch (error) {
             console.error("회사 목록 조회 오류:", error)
             return []

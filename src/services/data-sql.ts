@@ -23,7 +23,7 @@ export class DataSql {
             }
 
             const data = await res.json();
-            return data.common.map((item: { value: string; dataId: string; }) => ({
+            return data.data.map((item: { value: string; dataId: string; }) => ({
                 label: item.value,
                 value: item.dataId
             }));
@@ -53,7 +53,7 @@ export class DataSql {
             }
 
             const data = await res.json();
-            return data.common.map((val: {
+            return data.data.map((val: {
                 dataId: string;
                 groupId: string;
                 value: string;
@@ -184,7 +184,7 @@ export class DataSql {
 
             const data = await res.json();
 
-            return data.itemList.map((item: {
+            return data.data.map((item: {
                 companyIdx: string; itemIdx: string; itemCd: string; itemNm: string;
                 itemSpec: string; itemType: string; itemUnit: string; itemYn: string;
                 itemCreatedAt: string; itemUpdatedAt: string; itemEtc: string; itemTypeIdx: string;
@@ -303,7 +303,7 @@ export class DataSql {
 
             const data = await res.json();
 
-            return data.companyList.map((val: Company) => ({
+            return data.data.map((val: Company) => ({
                 ...val,
                 coType: val.coType || [] // 배열로 초기화
             }));

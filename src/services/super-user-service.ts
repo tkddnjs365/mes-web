@@ -12,7 +12,7 @@ interface LoginResponse {
     message: string;
     accessToken: string;
     refreshToken: string;
-    user: User;
+    data: User;
 }
 
 export class SuperUserService {
@@ -37,9 +37,9 @@ export class SuperUserService {
 
             const data: LoginResponse = await res.json();
             console.log("로그인 성공:", data);
-            console.log("data.user:", data.user);
+            console.log("data.data:", data.data);
 
-            return data.user;
+            return data.data;
         } catch (err) {
             console.error("API 호출 오류:", err);
             return null;
@@ -88,7 +88,7 @@ export class SuperUserService {
             }
 
             const data = await res.json();
-            return data.companyAdminDtoList || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []

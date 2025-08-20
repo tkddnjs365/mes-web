@@ -14,7 +14,7 @@ interface LoginResponse {
     message: string;
     accessToken: string;
     refreshToken: string;
-    user: User;
+    data: User;
 }
 
 export class UserService {
@@ -40,7 +40,7 @@ export class UserService {
 
             const data: LoginResponse = await res.json();
 
-            return data.user;
+            return data.data;
         } catch (err) {
             console.error("API 호출 오류:", err);
             return null;

@@ -18,6 +18,7 @@ const componentMap: Record<string, () => Promise<{ default: React.ComponentType 
     "item-mng": () => import("@/components/pages/item-mng"),
     "item-mng-list": () => import("@/components/pages/item-mng-list"),
     "company-mng": () => import("@/components/pages/company-mng"),
+    "company-mng-list": () => import("@/components/pages/company-mng-list"),
 };
 
 export class ProgramService {
@@ -66,7 +67,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            return data.programs || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []
@@ -183,7 +184,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            return data.programs || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []
@@ -255,7 +256,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            return data.programs || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []
@@ -281,7 +282,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            return data.menus || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []
@@ -339,7 +340,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            return data.programs || [];
+            return data.data || [];
         } catch (error) {
             console.error("조회 오류:", error)
             return []
@@ -415,7 +416,7 @@ export class ProgramService {
             }
 
             const data = await res.json();
-            const menuPrograms: ProgMenu[] = data.programs || [];
+            const menuPrograms: ProgMenu[] = data.data || [];
 
             // 3. 데이터 가공
             const parentMenus = menus?.filter(menu => menu.id === menu.parentId) || [];
