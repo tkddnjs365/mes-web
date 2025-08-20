@@ -265,26 +265,15 @@ export default function ItemMng() {
                     <div className="flex items-center gap-2 flex-wrap">
                         {/* 품목 - 개별 박스로 그룹핑 */}
                         <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
-                            <label
-                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
-                                품목
-                            </label>
-                            <input
-                                type="text"
+                            <FormLabelText
+                                label="품목"
                                 value={searchCondition.item}
-                                onChange={(e) => setSearchCondition({
-                                    ...searchCondition,
-                                    item: e.currentTarget.value
-                                })}
-                                className="w-[280px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                onChange={(val) => {
+                                    setSearchCondition({...searchCondition, item: val});
+                                }}
                                 placeholder="품목명 또는 품목코드 입력"
                                 disabled={isLoading}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSearch();
-                                    }
-                                }}
+                                inputWidth="w-[280px]"
                             />
                         </div>
                     </div>

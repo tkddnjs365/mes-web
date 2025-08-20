@@ -67,7 +67,7 @@ export default function CompanyMng() {
             width: 150,
             cellRenderer: (params: { value: string[] | null | undefined }) => {
                 return getCoTypeLabels(params.value);
-            }
+            },
         },
         {
             headerName: "사용여부",
@@ -267,7 +267,7 @@ export default function CompanyMng() {
     const handleExcel = () => {
         if (gridRef.current) {
             const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식
-            const fileName = `품목목록_${currentDate}`;
+            const fileName = `거래처목록_${currentDate}`;
             gridRef.current.exportToExcel(fileName);
         }
     }
@@ -299,26 +299,15 @@ export default function CompanyMng() {
                 <div className="p-2">
                     <div className="flex items-center gap-2 flex-wrap">
                         <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
-                            <label
-                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
-                                거래처명
-                            </label>
-                            <input
-                                type="text"
+                            <FormLabelText
+                                label="거래처명"
                                 value={searchCondition.company}
-                                onChange={(e) => setSearchCondition({
-                                    ...searchCondition,
-                                    company: e.currentTarget.value
-                                })}
-                                className="w-[280px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                onChange={(val) => {
+                                    setSearchCondition({...searchCondition, company: val});
+                                }}
                                 placeholder="거래처명 또는 거래처코드 입력"
                                 disabled={isLoading}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSearch();
-                                    }
-                                }}
+                                inputWidth="w-[280px]"
                             />
                         </div>
                     </div>

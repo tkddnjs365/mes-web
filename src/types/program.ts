@@ -1,55 +1,56 @@
 /* programs */
 export interface Program {
-  id: string
-  name: string
-  description: string
-  path: string
-  createdAt: string
-  updatedAt: string
+    id: string
+    name: string
+    description: string
+    path: string
+    createdAt: string
+    updatedAt: string
 }
 
 /* menus */
 export interface MenuCategory {
-  id: string
-  name: string
-  createdAt: string
-  updatedAt: string
-  description: string
-  sortOrder: number
-  parentId: string
+    id: string
+    name: string
+    createdAt: string
+    updatedAt: string
+    description: string
+    sortOrder: number
+    parentId: string
 }
 
 export interface UserProgram {
-  id: string
-  userId: string
-  programId: string
-  companyCode: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
+    id: string
+    userId: string
+    programId: string
+    companyCode: string
+    isActive: boolean
+    createdAt: string
+    updatedAt: string
 }
 
 /* prog_link_company */
 export interface CompanyProgram {
-  id: string
-  companyCode: string
-  programId: string
-  createdAt: string
-  updatedAt: string
+    id: string
+    companyCode: string
+    programId: string
+    createdAt: string
+    updatedAt: string
 }
 
 /* menu_link_prog */
 export interface MenuLinkProgram {
-  id: string
-  menuId: string
-  programId: string
-  createdAt: string
-  updatedAt: string
+    id: string
+    menuId: string
+    programId: string
+    createdAt: string
+    updatedAt: string
+    sortOrder: string
 }
 
 export interface ProgramWithDetails {
-  id: string
-  programId: string
+    id: string
+    programId: string
 }
 
 export interface MenuItem {
@@ -59,15 +60,17 @@ export interface MenuItem {
     programId?: string
 }
 
-export interface Prog_Menu_Company{
-  progIdx: string
-  progName : string
-  menuName : string
+export interface Prog_Menu_Company {
+    progIdx: string
+    progName: string
+    menuName: string
 }
 
-export interface ProgMenu{
-  progIdx: string
-  progName : string
-  menuIdx : string
-  progPath : string
+export interface ProgMenu {
+    progIdx: string
+    progName: string
+    menuIdx: string
+    progPath: string
+    menuOrder: string
+    progOrder: string
 }

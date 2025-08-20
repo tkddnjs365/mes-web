@@ -393,6 +393,29 @@ export class ProgramService {
         }
     }
 
+    /* 메뉴 프로그램 정렬순서 업데이트 */
+    static async updateMenuProgramOrder(menuId: string, programId: string, order: string): Promise<boolean> {
+        try {
+            const res = await fetch(`${utilsUrl.REST_API_URL}/program/updateMenuProgOrder`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({menuId, programId, order}),
+            });
+
+            if (!res.ok) {
+                console.error("updateMenuProgramOrder 실패:", res.statusText);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("오류:", error)
+            return false
+        }
+    }
+
     /* 사이드바 메뉴 조회 */
     static getAllMenuItems = async (): Promise<MenuItem[]> => {
         try {
@@ -437,28 +460,39 @@ export class ProgramService {
             });
 
             // 최종 구조 생성
-            return parentMenus.map(parentMenu => {
-                const children = childMenus
-                    .filter(child => child.parentId === parentMenu.id)
-                    .map(childMenu => {
-                        const programs = menuProgramMap.get(childMenu.id) || [];
-                        return {
-                            id: childMenu.name.toLowerCase().replace(/\s+/g, ''),
-                            title: childMenu.name,
-                            children: programs.map((program: { id: string, name: string, path: string }) => ({
-                                id: program.path,
-                                title: program.name,
-                                programId: program.id
-                            }))
-                        };
-                    });
+            return parentMenus
+                .sort((a, b) => a.sortOrder - b.sortOrder)
+                .map(parentMenu => {
+                    const children = childMenus
+                        .filter(child => child.parentId === parentMenu.id)
+                        .sort((a, b) => a.sortOrder - b.sortOrder)
+                        .map(childMenu => {
+                            const programs = menuProgramMap.get(childMenu.id) || [];
+                            return {
+                                id: childMenu.name.toLowerCase().replace(/\s+/g, ''),
+                                title: childMenu.name,
+                                children: programs
+                                    .sort((a: { id: string, name: string, path: string }, b: {
+                                        id: string, name: string, path: string
+                                    }) => {
+                                        const aOrder = menuPrograms.find(mp => mp.progIdx === a.id)?.progOrder || '0';
+                                        const bOrder = menuPrograms.find(mp => mp.progIdx === b.id)?.progOrder || '0';
+                                        return parseInt(aOrder) - parseInt(bOrder);
+                                    })
+                                    .map((program: { id: string, name: string, path: string }) => ({
+                                        id: program.path,
+                                        title: program.name,
+                                        programId: program.id
+                                    }))
+                            };
+                        });
 
-                return {
-                    id: parentMenu.name.toLowerCase().replace(/\s+/g, ''),
-                    title: parentMenu.name,
-                    children
-                };
-            });
+                    return {
+                        id: parentMenu.name.toLowerCase().replace(/\s+/g, ''),
+                        title: parentMenu.name,
+                        children
+                    };
+                });
 
         } catch (error) {
             console.error("Error fetching menu data:", error);

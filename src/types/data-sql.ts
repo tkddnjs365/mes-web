@@ -74,6 +74,7 @@ export interface Company {
     updatedUser: string;
 
     compCurrIdx: string;
+    countryIdx: string;
     createdUserIdx: string;
     updatedUserIdx: string
 

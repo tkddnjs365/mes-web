@@ -14,6 +14,7 @@ export default function SuperuserMenuMng() {
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [menuLinkPrograms, setMenuLinkPrograms] = useState<MenuLinkProgram[]>([]) // 중메뉴 프로그램
+    const [programOrderMap, setProgramOrderMap] = useState<Record<string, string>>({}) // 프로그램 정렬순서
 
     const [categoryFormData, setCategoryFormData] = useState({
         name: "",
@@ -100,6 +101,13 @@ export default function SuperuserMenuMng() {
         try {
             const data = await ProgramService.getMenuLinkPrograms(menuId)
             setMenuLinkPrograms(data)
+            
+            // 조회된 데이터의 sortOrder로 programOrderMap 초기화
+            const orderMap: Record<string, string> = {}
+            data.forEach(item => {
+                orderMap[item.programId] = item.sortOrder || "0"
+            })
+            setProgramOrderMap(orderMap)
         } catch (error) {
             console.error("회사 프로그램 목록 로드 실패:", error)
         }
@@ -123,6 +131,15 @@ export default function SuperuserMenuMng() {
 
             if (success) {
                 await loadMenuLinkPrograms(selectedSubCategory.id)
+                if (!isConnected) {
+                    setProgramOrderMap(prev => ({...prev, [programId]: "0"}))
+                } else {
+                    setProgramOrderMap(prev => {
+                        const newMap = {...prev}
+                        delete newMap[programId]
+                        return newMap
+                    })
+                }
             } else {
                 alert(`프로그램 ${isConnected ? "연결 해제" : "연결"}에 실패했습니다.`)
             }
@@ -130,6 +147,20 @@ export default function SuperuserMenuMng() {
             alert(`프로그램 ${isConnected ? "연결 해제" : "연결"} 중 오류가 발생했습니다.`)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    /* 프로그램 정렬순서 업데이트 */
+    const handleUpdateProgramOrder = async (menuId: string, programId: string, order: string) => {
+        if (!selectedSubCategory) return
+
+        try {
+            const success = await ProgramService.updateMenuProgramOrder(menuId, programId, order)
+            if (!success) {
+                alert("정렬순서 업데이트에 실패했습니다.")
+            }
+        } catch {
+            alert("정렬순서 업데이트 중 오류가 발생했습니다.")
         }
     }
 
@@ -269,30 +300,49 @@ export default function SuperuserMenuMng() {
                                             return (
                                                 <div key={program.id}
                                                      className="p-4 border border-gray-200 rounded-lg">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center space-x-3">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={isConnected}
-                                                                onChange={() => handleToggleProgram(program.id, isConnected)}
-                                                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                                                disabled={isLoading}
-                                                            />
-                                                            <div>
-                                                                <div
-                                                                    className="font-semibold">{program.name}</div>
-                                                                <div
-                                                                    className="text-sm text-gray-600 font-mono">{program.path}</div>
-                                                                {program.description && (
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center space-x-3">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={isConnected}
+                                                                    onChange={() => handleToggleProgram(program.id, isConnected)}
+                                                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                                                    disabled={isLoading}
+                                                                />
+                                                                <div>
                                                                     <div
-                                                                        className="text-xs text-gray-500 mt-1">{program.description}</div>
-                                                                )}
+                                                                        className="font-semibold">{program.name}</div>
+                                                                    <div
+                                                                        className="text-sm text-gray-600 font-mono">{program.path}</div>
+                                                                    {program.description && (
+                                                                        <div
+                                                                            className="text-xs text-gray-500 mt-1">{program.description}</div>
+                                                                    )}
+                                                                </div>
                                                             </div>
+                                                            <span
+                                                                className={`px-2 py-1 rounded-full text-xs font-medium ${isConnected ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+                                                                    {isConnected ? "연결됨" : "연결 안됨"}
+                                                                     </span>
                                                         </div>
-                                                        <span
-                                                            className={`px-2 py-1 rounded-full text-xs font-medium ${isConnected ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
-                                                                {isConnected ? "연결됨" : "연결 안됨"}
-                                                                 </span>
+                                                        {isConnected && (
+                                                            <div className="flex items-center space-x-2">
+                                                                <label
+                                                                    className="text-sm font-medium text-gray-700">정렬순서:</label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={programOrderMap[program.id] || "0"}
+                                                                    onChange={(e) => setProgramOrderMap(prev => ({
+                                                                        ...prev,
+                                                                        [program.id]: e.target.value
+                                                                    }))}
+                                                                    onBlur={() => handleUpdateProgramOrder(selectedSubCategory!.id, program.id, programOrderMap[program.id] || "0")}
+                                                                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                                    min="0"
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )

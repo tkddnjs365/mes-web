@@ -40,4 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-utilsUrl.ts
+src/utils/utilsUrl.ts

@@ -8,6 +8,8 @@ import {DataSql} from "@/services/data-sql";
 import {ColDef, ICellRendererParams} from "ag-grid-community";
 import {formatToKoreanDate} from "@/utils/data-format";
 import {CommonToolbar} from "@/components/common/common-toolbar";
+import {FormLabelText} from "@/components/ui/form-label-text";
+import {FormLabelSelect} from "@/components/ui/form-label-select";
 
 // 조회 조건
 const SEARCH_CONDITION = {
@@ -165,71 +167,44 @@ export default function ItemMngList() {
                     <div className="flex items-center gap-2 flex-wrap">
                         {/* 품목 */}
                         <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
-                            <label
-                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
-                                품목
-                            </label>
-                            <input
-                                type="text"
+                            <FormLabelText
+                                label="품목"
                                 value={searchCondition.item}
-                                onChange={(e) => setSearchCondition({
-                                    ...searchCondition,
-                                    item: e.currentTarget.value
-                                })}
-                                className="w-[280px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                onChange={(val) => {
+                                    setSearchCondition({...searchCondition, item: val});
+                                }}
                                 placeholder="품목명 또는 품목코드 입력"
                                 disabled={isLoading}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSearch();
-                                    }
-                                }}
+                                inputWidth="w-[280px]"
                             />
                         </div>
 
                         {/* 품목구분 */}
                         <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
-                            <label
-                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
-                                품목구분
-                            </label>
-                            <select
+                            <FormLabelSelect
+                                label="품목구분"
                                 value={searchCondition.item_type}
-                                onChange={(e) => {
-                                    setSearchCondition({...searchCondition, item_type: e.target.value});
+                                onChange={(val) => {
+                                    const value = val as string;
+                                    setSearchCondition({...searchCondition, item_type: value});
                                 }}
-                                className="w-[150px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                options={itemTypes}
                                 disabled={isLoading}
-                            >
-                                {itemTypes.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
 
                         {/* 사용여부 */}
                         <div className="flex items-center gap-3 bg-gray-50 px-4 py-1 rounded-lg border border-gray-200">
-                            <label
-                                className="text-sm font-semibold text-gray-700 min-w-[50px] whitespace-nowrap text-center">
-                                사용여부
-                            </label>
-                            <select
+                            <FormLabelSelect
+                                label="사용여부"
                                 value={searchCondition.item_yn}
-                                onChange={(e) => {
-                                    setSearchCondition({...searchCondition, item_yn: e.target.value});
+                                onChange={(val) => {
+                                    const value = val as string;
+                                    setSearchCondition({...searchCondition, item_yn: value});
                                 }}
-                                className="w-[150px] min-h-[36px] px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                options={USE_YN_OPTIONS}
                                 disabled={isLoading}
-                            >
-                                {USE_YN_OPTIONS.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
                     </div>
                 </div>
