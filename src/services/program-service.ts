@@ -797,6 +797,7 @@ export class ProgramService {
                 programId: cp.prog_idx,
                 createdAt: cp.created_at,
                 updatedAt: cp.updated_at,
+                sortOrder: cp.sortOrder || "0",
             }))
         } catch {
             return []
