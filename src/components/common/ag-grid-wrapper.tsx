@@ -230,6 +230,10 @@ const ForwardedAgGridWrapper = React.forwardRef(AgGridWrapper) as <T>(
 ) => ReturnType<typeof AgGridWrapper>;
 
 // 개발자 도구에서 컴포넌트 이름이 제대로 표시되도록 displayName 설정
-(ForwardedAgGridWrapper as any).displayName = 'AgGridWrapper';
+Object.defineProperty(ForwardedAgGridWrapper, 'displayName', {
+    value: 'AgGridWrapper',
+    writable: false,
+    configurable: true
+});
 
 export default ForwardedAgGridWrapper;
