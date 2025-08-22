@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {ColDef} from "ag-grid-community";
 import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapper";
 import {DataSql} from "@/services/data-sql";
-import {CommonCode, Company, CompanyInsertData, Item} from "@/types/data-sql";
+import {CommonCode, Company, CompanyInsertData} from "@/types/data-sql";
 import {useAppContext} from "@/contexts/app-context";
 import {CommonToolbar} from "@/components/common/common-toolbar";
 import {FormLabelText} from "@/components/ui/form-label-text"

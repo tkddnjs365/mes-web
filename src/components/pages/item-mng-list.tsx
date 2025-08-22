@@ -1,7 +1,7 @@
 "use client"
 
 import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapper";
-import {CommonCode, Company, Item} from "@/types/data-sql";
+import {CommonCode, Item} from "@/types/data-sql";
 import {useEffect, useRef, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
 import {DataSql} from "@/services/data-sql";
