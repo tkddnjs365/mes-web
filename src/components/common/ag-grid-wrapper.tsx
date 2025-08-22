@@ -50,7 +50,7 @@ export interface AgGridWrapperRef<T = unknown> {
 // AG Grid를 감싸는 래퍼 컴포넌트 정의
 const AgGridWrapper = <T, >(
     {rowData, columnDefs, height, width, onRowClick, title = "데이터 목록"}: AgGridWrapperProps<T>,
-    ref: React.Ref<AgGridWrapperRef>
+    ref: React.Ref<AgGridWrapperRef<T>>
 ) => {
 
     // AG Grid의 API에 접근하기 위한 ref 생성
