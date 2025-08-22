@@ -117,10 +117,19 @@ export default function ItemMng() {
                 DataSql.get_comm_code(currentUser.companyIdx, 'sys.item_unit')
             ]);
 
-            // 품목구분
-            setItemTypes([{label: "", value: ""}, ...itemTypeResult.value]);
-            // 품목단위
-            setItemUnits([{label: "", value: ""}, ...itemUnitResult.value]);
+            // 품목구분 코드 설정
+            if (itemTypeResult.status === 'fulfilled') {
+                setItemTypes([{label: "", value: ""}, ...itemTypeResult.value]);
+            } else {
+                console.error("품목구분 코드 로드 실패:", itemTypeResult.reason);
+            }
+
+            // 품목단위 코드 설정
+            if (itemUnitResult.status === 'fulfilled') {
+                setItemUnits([{label: "", value: ""}, ...itemUnitResult.value]);
+            } else {
+                console.error("품목단위 코드 로드 실패:", itemUnitResult.reason);
+            }
         } catch (error) {
             console.error("공통코드 로드 실패:", error);
         }
@@ -139,8 +148,22 @@ export default function ItemMng() {
                     DataSql.get_item_list(currentUser.companyIdx, searchCondition.item),
                     DataSql.get_company_list(currentUser.companyIdx, "", "", "Y")
                 ]);
-                setRowData(itemResult.value)
-                setCompRowData(companyResult.value)
+
+                // 품목 목록 데이터 설정
+                if (itemResult.status === 'fulfilled') {
+                    setRowData(itemResult.value || []);
+                } else {
+                    console.error("품목 목록 로드 실패:", itemResult.reason);
+                    setRowData([]);
+                }
+
+                // 거래처 목록 데이터 설정
+                if (companyResult.status === 'fulfilled') {
+                    setCompRowData(companyResult.value || []);
+                } else {
+                    console.error("거래처 목록 로드 실패:", companyResult.reason);
+                    setCompRowData([]);
+                }
             }
         } catch (error) {
             console.error("프로그램 목록 로드 실패:", error)
