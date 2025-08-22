@@ -71,7 +71,7 @@ export default function CompanyMngList() {
         {headerName: "수정일시", field: "updatedAt", width: 200, cellClass: "ag-text-center-cell",},
     ], [getCoTypeLabels]);
 
-    const gridRef = useRef<AgGridWrapperRef>(null);
+    const gridRef = useRef<AgGridWrapperRef<Company>>(null);
 
     // 컴포넌트 마운트 시 공통코드 로드
     useEffect(() => {

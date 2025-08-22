@@ -1,7 +1,7 @@
 "use client"
 
 import AgGridWrapper, {AgGridWrapperRef} from "@/components/common/ag-grid-wrapper";
-import {CommonCode, Item} from "@/types/data-sql";
+import {CommonCode, Company, Item} from "@/types/data-sql";
 import {useEffect, useRef, useState} from "react";
 import {useAppContext} from "@/contexts/app-context";
 import {DataSql} from "@/services/data-sql";
@@ -27,7 +27,7 @@ export default function ItemMngList() {
     const {currentUser} = useAppContext()
     const [isLoading, setIsLoading] = useState(false)
     const [searchCondition, setSearchCondition] = useState(SEARCH_CONDITION) // 조회조건용
-    const gridRef = useRef<AgGridWrapperRef>(null);
+    const gridRef = useRef<AgGridWrapperRef<Item>>(null);
     const [rowData, setRowData] = useState<Item[]>([])
 
     const [itemTypes, setItemTypes] = useState<CommonCode[]>([{label: "", value: ""}])
