@@ -40,9 +40,9 @@ interface AgGridWrapperProps<T> {
 }
 
 // 부모 컴포넌트에서 호출할 수 있는 메서드들의 타입 정의
-export interface AgGridWrapperRef {
+export interface AgGridWrapperRef<T = unknown> {
     exportToExcel: (fileName?: string) => void; // CSV로 데이터 내보내기 함수
-    getSelectedRows: () => string[];                // 선택된 행 데이터 가져오기 함수 추가
+    getSelectedRows: () => T[];                // 선택된 행 데이터 가져오기 함수 추가
     selectAll: () => void;                       // 전체 선택 함수 추가
     deselectAll: () => void;                     // 전체 선택 해제 함수 추가
 }

@@ -97,8 +97,8 @@ export default function ItemMng() {
     ], []);
 
     // 그리드 참조 객체들
-    const gridRef = useRef<AgGridWrapperRef>(null);           // 메인 품목 그리드 참조
-    const companyGridRef = useRef<AgGridWrapperRef>(null);    // 거래처 그리드 참조
+    const gridRef = useRef<AgGridWrapperRef<Item>>(null);          // 메인 품목 그리드 참조
+    const companyGridRef = useRef<AgGridWrapperRef<Company>>(null);   // 거래처 그리드 참조
 
     // 컴포넌트 마운트 시 공통코드 로드
     useEffect(() => {
@@ -127,7 +127,7 @@ export default function ItemMng() {
     }, [currentUser?.companyIdx]);
 
     /* 품목 목록 조회 */
-    const loadItemList = async () => {
+    const loadItemList = useCallback(async () => {
         setIsLoading(true)
 
         try {
@@ -149,7 +149,7 @@ export default function ItemMng() {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [currentUser?.companyIdx, searchCondition.item]);
 
     /* 품목 상세 정보 로드 */
     const loadItemDetail = useCallback(async (item_idx: string) => {
@@ -200,14 +200,14 @@ export default function ItemMng() {
     }, [loadItemDetail]);
 
     // 선택된 거래처 정보를 가져오는 함수
-    const getSelectedCompanies = (): Company[] => {
+    const getSelectedCompanies = useCallback((): Company[] => {
         // AG Grid에서 선택된 행 데이터 가져오기
         if (companyGridRef.current) {
             const selectedRows = companyGridRef.current.getSelectedRows();
             return selectedRows as Company[];
         }
         return [];
-    };
+    }, []);
 
     /**
      * 폼 유효성 검증 함수
