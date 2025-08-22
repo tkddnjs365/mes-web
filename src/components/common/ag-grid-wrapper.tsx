@@ -226,10 +226,10 @@ const AgGridWrapper = <T, >(
 
 // React.forwardRef를 사용해서 ref를 전달할 수 있도록 래핑
 const ForwardedAgGridWrapper = React.forwardRef(AgGridWrapper) as <T>(
-    props: AgGridWrapperProps<T> & { ref?: React.Ref<AgGridWrapperRef> }
+    props: AgGridWrapperProps<T> & { ref?: React.Ref<AgGridWrapperRef<T>> }
 ) => ReturnType<typeof AgGridWrapper>;
 
 // 개발자 도구에서 컴포넌트 이름이 제대로 표시되도록 displayName 설정
-ForwardedAgGridWrapper.displayName = 'AgGridWrapper';
+(ForwardedAgGridWrapper as any).displayName = 'AgGridWrapper';
 
 export default ForwardedAgGridWrapper;
