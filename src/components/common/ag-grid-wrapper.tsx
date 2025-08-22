@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useImperativeHandle, useRef, useMemo, useCallback} from "react";
+import React, {useCallback, useImperativeHandle, useMemo, useRef} from "react";
 import {AgGridReact} from "ag-grid-react";
 import {ColDef, RowClickedEvent} from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
@@ -116,13 +116,13 @@ const AgGridWrapper = <T, >(
 
     // 최종 컬럼 정의: 순번 컬럼을 맨 앞에 추가 - useMemo로 메모이제이션
     const finalColumnDefs: ColDef[] = useMemo(() =>
-        [indexColumn, ...columnDefs],
+            [indexColumn, ...columnDefs],
         [indexColumn, columnDefs]
     );
 
     // 체크박스 컬럼이 있는지 확인 - useMemo로 메모이제이션
     const hasCheckboxColumn = useMemo(() =>
-        finalColumnDefs.some(col => col.field === 'chk'),
+            finalColumnDefs.some(col => col.field === 'chk'),
         [finalColumnDefs]
     );
 
@@ -142,14 +142,14 @@ const AgGridWrapper = <T, >(
 
     // 체크박스 설정 - useMemo로 메모이제이션
     const checkboxConfig = useMemo(() =>
-        hasCheckboxColumn ? {
-            rowSelection: {
-                mode: 'multiRow' as const,           // 다중 행 선택 모드
-                checkboxes: true,           // 체크박스 표시
-                headerCheckbox: true,       // 헤더에 전체 선택 체크박스
-                enableClickSelection: false // 체크박스만으로 선택 (행 클릭으로는 선택 안됨)
-            }
-        } : {},
+            hasCheckboxColumn ? {
+                rowSelection: {
+                    mode: 'multiRow' as const,           // 다중 행 선택 모드
+                    checkboxes: true,           // 체크박스 표시
+                    headerCheckbox: true,       // 헤더에 전체 선택 체크박스
+                    enableClickSelection: false // 체크박스만으로 선택 (행 클릭으로는 선택 안됨)
+                }
+            } : {},
         [hasCheckboxColumn]
     );
 
@@ -208,7 +208,7 @@ const AgGridWrapper = <T, >(
                     columnDefs={finalColumnDefs}     // 컬럼 정의 (순번 컬럼 포함)
                     pagination={true}                // 페이지네이션 활성화
                     paginationPageSize={GRID_CONFIG.DEFAULT_PAGE_SIZE}          // 한 페이지에 15개 행 표시
-                    paginationPageSizeSelector={GRID_CONFIG.PAGE_SIZE_OPTIONS} // 페이지 크기 선택 옵션
+                    paginationPageSizeSelector={[...GRID_CONFIG.PAGE_SIZE_OPTIONS]}  // 페이지 크기 선택 옵션
                     enableCellTextSelection={true}   // 셀 텍스트 선택 가능
                     defaultColDef={defaultColDef}    // 모든 컬럼에 기본적으로 적용될 설정
                     headerHeight={GRID_CONFIG.HEADER_ROW_HEIGHT}                // 헤더 높이
@@ -217,7 +217,7 @@ const AgGridWrapper = <T, >(
                     theme={"legacy"}                 // AG Grid 테마
                     onRowClicked={handleRowClick}    // 행 클릭 이벤트 핸들러
                     rowClassRules={rowClassRules}    // 모든 행에 적용할 CSS 클래스 규칙
-                    {...checkboxConfig}              // 체크박스 컬럼이 있을 때만 다중 선택 기능 활성화
+                    {...checkboxConfig} // 체크박스 컬럼이 있을 때만 다중 선택 기능 활성화
                 />
             </div>
         </div>
