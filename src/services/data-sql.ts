@@ -211,7 +211,8 @@ export class DataSql {
     }
 
     /* 품목 저장 */
-    static async set_item_list(cur_item_idx: string, save_data: ItemInsertData[]): Promise<{
+    static async set_item_list(cur_item_idx: string, save_data: ItemInsertData[],
+                               item_company_data?: Array<{ company_idx: string }>): Promise<{
         success: boolean;
         error?: string;
         item_idx?: string
@@ -242,7 +243,14 @@ export class DataSql {
                         itemType: item.item_type,
                         itemUnit: item.item_unit,
                         useYn: item.use_yn,
-                        etc: item.etc
+                        etc: item.etc,
+
+                        // 거래처 연결 정보 (있는 경우에만 포함)
+                        ...(item_company_data && item_company_data.length > 0 && {
+                            itemCompanies: item_company_data.map(company => ({
+                                companyIdx: company.company_idx
+                            }))
+                        })
                     }),
                 }
             );
@@ -272,7 +280,6 @@ export class DataSql {
                     error: data.error || '저장 실패'
                 };
             }
-
         } catch (error) {
             console.error("품목 저장 오류:", error);
             return {
@@ -356,7 +363,7 @@ export class DataSql {
                         country: saveData.country,
                         userIdx: saveData.userIdx,
 
-                    coType: saveData.coType || [],
+                        coType: saveData.coType || [],
                     }),
                 }
             );
