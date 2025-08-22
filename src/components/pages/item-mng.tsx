@@ -91,7 +91,6 @@ export default function ItemMng() {
     ], []);
     const venderColumnDefs = useMemo<ColDef[]>(() => [
         {headerName: "coIdx", field: "coIdx", width: 50, hide: true}, // 숨김 필드 (PK)
-        {headerName: "", field: "chk", width: 50, sortable: false, filter: false, cellClass: "ag-text-center-cell"}, // 체크박스 컬럼
         {headerName: "거래처코드", field: "coCd", width: 150},
         {headerName: "거래처명", field: "coNm", width: 250}
     ], []);
@@ -363,10 +362,7 @@ export default function ItemMng() {
         };
     }, [invalidFields]);
 
-    // 탭 렌더링 함수
-    /**
-     * 기본정보 탭 렌더링
-     */
+    /* 기본정보 탭 렌더링 */
     const renderBasicTab = useMemo(() => (
         <div className="space-y-4">
             <div className="grid grid-cols-1 gap-3">
@@ -437,9 +433,7 @@ export default function ItemMng() {
             </div>
         </div>
     ), [saveCondition, isLoading, invalidFields, itemTypes, itemUnits, createFieldChangeHandler]);
-    /**
-     * 거래처정보 탭 렌더링
-     */
+    /* 거래처정보 탭 렌더링 */
     const renderVenderTab = useMemo(() => (
         <div className="space-y-4">
             <div className="h-[45vh]">
@@ -450,14 +444,12 @@ export default function ItemMng() {
                     height={"100%"}
                     width={"100%"}
                     title="거래처 목록"
+                    enableCheckbox={true}
                 />
             </div>
         </div>
     ), [compRowData, venderColumnDefs]);
-
-    /**
-     * 기타정보 탭 렌더링
-     */
+    /* 기타정보 탭 렌더링 */
     const renderEtcTab = useMemo(() => (
         <div className="space-y-4">
             <FormLabelText
@@ -471,7 +463,6 @@ export default function ItemMng() {
             />
         </div>
     ), [saveCondition.etc, isLoading]);
-
     /* 탭별 랜더링 */
     const renderTabContent = useCallback(() => {
         switch (activeTab) {

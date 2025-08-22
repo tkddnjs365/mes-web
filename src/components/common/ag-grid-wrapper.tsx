@@ -12,7 +12,7 @@ const GRID_CONFIG = {
     ROW_HEIGHT: 35,
     HEADER_ROW_HEIGHT: 40,
     DEFAULT_PAGE_SIZE: 15,
-    INDEX_COLUMN_WIDTH: 80,
+    INDEX_COLUMN_WIDTH: 60, // 순번 컬럼 너비
     PAGE_SIZE_OPTIONS: [10, 15, 25, 50]
 } as const;
 
@@ -37,6 +37,7 @@ interface AgGridWrapperProps<T> {
     width: string;                  // 그리드 너비 (예: "100%")
     onRowClick?: (data: T) => void; // 행을 클릭했을 때 실행할 함수 (선택사항)
     title?: string;                 // 그리드 제목 (기본값: "데이터 목록")
+    enableCheckbox?: boolean;       // 체크박스 활성화 여부
 }
 
 // 부모 컴포넌트에서 호출할 수 있는 메서드들의 타입 정의
@@ -49,7 +50,7 @@ export interface AgGridWrapperRef<T = unknown> {
 
 // AG Grid를 감싸는 래퍼 컴포넌트 정의
 const AgGridWrapper = <T, >(
-    {rowData, columnDefs, height, width, onRowClick, title = "데이터 목록"}: AgGridWrapperProps<T>,
+    {rowData, columnDefs, height, width, onRowClick, title = "데이터 목록", enableCheckbox = false}: AgGridWrapperProps<T>,
     ref: React.Ref<AgGridWrapperRef<T>>
 ) => {
 
@@ -122,8 +123,8 @@ const AgGridWrapper = <T, >(
 
     // 체크박스 컬럼이 있는지 확인 - useMemo로 메모이제이션
     const hasCheckboxColumn = useMemo(() =>
-            finalColumnDefs.some(col => col.field === 'chk'),
-        [finalColumnDefs]
+            enableCheckbox || finalColumnDefs.some(col => col.field === 'chk'),
+        [enableCheckbox, finalColumnDefs]
     );
 
     // 기본 컬럼 정의 - useMemo로 메모이제이션
